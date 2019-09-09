@@ -23,7 +23,6 @@ class OrdersManager:
                                                                base_url=self.settings.BASE_URL,
                                                                api_url=self.settings.API_URL,
                                                                instrument=self.orders_сalculator.SYMBOL)
-
     def load_settings(self, file=None):
         testdata_file = f'{file}.json' if file else f'{self.file_settings}.json'
         with open(testdata_file) as f:
@@ -72,8 +71,6 @@ class OrdersManager:
 
 
     def replace_orders(self, to_create, to_cancel):
-
-        # Could happen if we exceed a delta limit
         if len(to_cancel) > 0:
             print("Canceling %d orders:" % (len(to_cancel)))
             for order in to_cancel:
@@ -91,3 +88,7 @@ class OrdersManager:
                 if 'orderID' in responce:
                     print("%4s %d @ %d" % (
                     responce['side'], responce['orderQty'], responce['price']))
+                if 'order' in responce:
+                    order = responce['order']
+                    print("%4s %d @ %d" % (
+                        order['direction'], order['amount'], order['price']))
