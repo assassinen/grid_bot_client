@@ -40,10 +40,10 @@ class OrdersManager:
 
     def get_data_for_orders_сalculator(self):
         return {
-            'positions': self.get_positions(),
-            'open_orders': self.get_open_orders(),
             'last_trade_price': self.get_last_trade_price(),
-            'last_order_price': self.get_last_order_price()
+            'last_order_price': self.get_last_order_price(),
+            'open_orders': self.get_open_orders(),
+            'positions': self.get_positions()
         }
 
     async def run_loop(self):
@@ -58,9 +58,15 @@ class OrdersManager:
             await asyncio.sleep(self.LOOP_INTERVAL)
 
 
+    def is_not_correct(self, to_create):
+        reverse_orders_qty = sum([order['orderQty'] for order in to_create
+                                  if order['side'] != self.GRID_SIDE])
+        positions_qty = self.get_positions()['size']
+
+        return reverse_orders_qty > positions_qty
+
+
     def replace_orders(self, to_create, to_cancel):
-        # print("Orders for create: {}".format(to_create))
-        # print("Orders for cancel: {}".format(to_cancel))
 
         # Could happen if we exceed a delta limit
         if len(to_cancel) > 0:
@@ -69,6 +75,9 @@ class OrdersManager:
                 print("%4s %d @ %d" % (
                 order['side'], order['orderQty'], order['price']))
             self.exchange.cancel_all_orders()
+
+        if self.is_not_correct(to_create):
+            return
 
         if len(to_create) > 0:
             print("Creating %d orders:" % (len(to_create)))

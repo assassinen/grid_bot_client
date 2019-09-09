@@ -31,7 +31,7 @@ class AveragePrice:
     def get_price(self, side, price=None):
         ratio = 1 if side == OrderSide.sell else -1
         delta = self.ORDER_STEP * ratio if side == self.GRID_SIDE else self.ORDER_SPREAD * ratio
-        price = price if price else self.last_trade_price
+        price = round(price) if price else self.last_trade_price
         return (min(price, self.last_trade_price) + delta if side == OrderSide.buy else
                 max(price, self.last_trade_price) + delta)
 
