@@ -1,0 +1,18 @@
+[
+  {
+    "py/object": "models.settings.ExchangeSettings",
+    "API_KEY": "EDwDQjVbWdHgNa5V-duD1eKD",
+    "API_SECRET": "T5t1bugZFKUHJLXQB3JlhHy3pD7GxfzaqanWREv4LYF6Ld_r",
+    "API_URL": "/api/v1/",
+    "BASE_URL": "https://testnet.bitmex.com",
+    "LOOP_INTERVAL": 5
+  },
+  {
+    "py/object": "models.settings.ExchangeSettings",
+    "API_KEY": "Y3sFiwog46-1qtsxPCoK0Gpu",
+    "API_SECRET": "pN9kRI_7ucOmNz6L9K79_S1meKQP2aoBxsjIpMBY-xbTSB_2",
+    "API_URL": "/api/v1/",
+    "BASE_URL": "https://www.bitmex.com",
+    "LOOP_INTERVAL": 3
+  }
+]
