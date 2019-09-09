@@ -2,8 +2,7 @@ from bitmex.exchange import BitmexExchangeInterface
 from deribit.exchange_v2 import DeribitExchangeInterface
 import jsonpickle
 import asyncio
-
-
+from utils import log
 
 class OrdersManager:
 
@@ -23,6 +22,9 @@ class OrdersManager:
                                                                base_url=self.settings.BASE_URL,
                                                                api_url=self.settings.API_URL,
                                                                instrument=self.orders_сalculator.SYMBOL)
+        self.logger = log.setup_custom_logger(self.API_KEY)
+        
+        
     def load_settings(self, file=None):
         testdata_file = f'{file}.json' if file else f'{self.file_settings}.json'
         with open(testdata_file) as f:
@@ -72,9 +74,9 @@ class OrdersManager:
 
     def replace_orders(self, to_create, to_cancel):
         if len(to_cancel) > 0:
-            print("Canceling %d orders:" % (len(to_cancel)))
+            self.logger.info("Canceling %d orders:" % (len(to_cancel)))
             for order in to_cancel:
-                print("%4s %d @ %d" % (
+                self.logger.info("%4s %d @ %d" % (
                 order['side'], order['orderQty'], order['price']))
             self.exchange.cancel_all_orders()
 
@@ -82,13 +84,13 @@ class OrdersManager:
             return
 
         if len(to_create) > 0:
-            print("Creating %d orders:" % (len(to_create)))
+            self.logger.info("Creating %d orders:" % (len(to_create)))
             for order in to_create:
                 responce = self.exchange.create_order(order)
                 if 'orderID' in responce:
-                    print("%4s %d @ %d" % (
-                    responce['side'], responce['orderQty'], responce['price']))
+                    self.logger.info("%4s %d @ %d" % (
+                        responce['side'], responce['orderQty'], responce['price']))
                 if 'order' in responce:
                     order = responce['order']
-                    print("%4s %d @ %d" % (
+                    self.logger.info("%4s %d @ %d" % (
                         order['direction'], order['amount'], order['price']))

@@ -1,4 +1,5 @@
 from models.states import OrderSide
+from utils import log
 
 class AveragePrice:
 
@@ -14,6 +15,7 @@ class AveragePrice:
         self.orders = {}
         self.orders[OrderSide.sell] = {}
         self.orders[OrderSide.buy] = {}
+        self.logger = log.setup_custom_logger(self.API_KEY)
 
     def get_api_key(self):
         return self.API_KEY
@@ -57,10 +59,10 @@ class AveragePrice:
     def update_grid_orders(self):
         if self.positions['size'] >= self.GRID_DEPTH * self.ORDER_SIZE:
             self.orders[self.GRID_SIDE] = {}
-            print("achieved the acceptable depth: {}".format(self.orders[OrderSide.buy]))
+            self.logger.info("achieved the acceptable depth: {}".format(self.orders[OrderSide.buy]))
         else:
             self.orders[self.GRID_SIDE] = self.create_grid_order()
-            print("grid calculated: {}".format(self.orders[OrderSide.buy]))
+            self.logger.info("grid calculated: {}".format(self.orders[OrderSide.buy]))
 
     def update_reverse_orders(self):
         side = self.REVERSE_SIDE
@@ -71,7 +73,7 @@ class AveragePrice:
                      "orderQty": size,
                      "side": side}
             self.orders[side] = order
-        print("reverse calculated: {}".format(self.orders[OrderSide.sell]))
+        self.logger.info("reverse calculated: {}".format(self.orders[OrderSide.sell]))
 
     def unpack(self, kw):
         if len([i for i in kw.values() if i is None]) == 0:
@@ -86,10 +88,10 @@ class AveragePrice:
 
     def update(self, kw):
         if self.unpack(kw) and (self.over_price() or not self.orders_is_converge()):
-            print("recalculation price: {}".
+            self.logger.info("recalculation price: {}".
                   format(not self.orders_is_converge() or self.over_price()))
-            print("existing_orders_price: {}".format(self.existing_orders_price))
-            print("design_orders_price: {}".format(self.design_orders_price))
+            self.logger.info("existing_orders_price: {}".format(self.existing_orders_price))
+            self.logger.info("design_orders_price: {}".format(self.design_orders_price))
             to_cancel = self.open_orders
             self.update_grid_orders()
             self.orders[self.REVERSE_SIDE] = {}
