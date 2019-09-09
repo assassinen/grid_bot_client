@@ -1,5 +1,6 @@
 from bitmex.generate_signature import generate_signature
 import requests
+import time
 
 
 class Session():
@@ -11,8 +12,9 @@ class Session():
         self.api_url = api_url
 
     def get_headers(self, metod, path, data=''):
-        r = requests.get('http://www.direct-time.ru/track.php?id=time_utc')
-        expires = int(r.text[:-3]) + 5
+        # r = requests.get('http://www.direct-time.ru/track.php?id=time_utc')
+        # expires = int(r.text[:-3]) + 5
+        expires = int(time.time()) + 5
         headers = {}
         headers['api-expires'] = str(expires)
         headers['api-key'] = self.key
@@ -33,7 +35,9 @@ class Session():
 
         if response.status_code != 200:
             raise Exception("Wrong response code: {0}".format(response.status_code))
+
         json = response.json()
+
 
         # if "error" not in json:
         #     if isinstance(json, list):

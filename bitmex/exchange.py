@@ -37,7 +37,7 @@ class ExchangeInterface:
                 '&symbol={}'.format(self.instrument)
 
         open_orders = self.session.get('order', query)
-        return [{'price': order['price'],
+        return [{'price': round(order['price']),
                  'orderQty': order['orderQty'],
                  'side': order['side']}
                 for order in open_orders]

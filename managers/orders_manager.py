@@ -74,7 +74,6 @@ class OrdersManager:
             print("Creating %d orders:" % (len(to_create)))
             for order in to_create:
                 responce = self.exchange.create_order(order)
-                if 'order' in responce:
-                    order = responce['order']
+                if 'orderID' in responce:
                     print("%4s %d @ %d" % (
-                    order['direction'], order['amount'], order['price']))
+                    responce['side'], responce['orderQty'], responce['price']))
