@@ -16,7 +16,7 @@ class AveragePrice:
         self.orders = {}
         self.orders[OrderSide.sell] = {}
         self.orders[OrderSide.buy] = {}
-        self.logger = logging.getLogger(f'{__name__}.{self.API_KEY}')
+        self.logger = logging.getLogger(f'average_price.{self.API_KEY}')
         log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
         logging.basicConfig(format=log_format, level=logging.INFO)
 

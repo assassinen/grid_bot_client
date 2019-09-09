@@ -23,7 +23,7 @@ class OrdersManager:
                                                                base_url=self.settings.BASE_URL,
                                                                api_url=self.settings.API_URL,
                                                                instrument=self.orders_сalculator.SYMBOL)
-        self.logger = logging.getLogger(f'{__name__}.{self.API_KEY}')
+        self.logger = logging.getLogger(f'orders_manager.{self.API_KEY}')
         log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
         logging.basicConfig(format=log_format, level=logging.INFO)
         
