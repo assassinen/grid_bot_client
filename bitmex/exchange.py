@@ -1,6 +1,6 @@
 from bitmex.session import Session
 
-class ExchangeInterface:
+class BitmexExchangeInterface:
 
     def __init__(self, key, secret, base_url, api_url, instrument):
         self.instrument = instrument

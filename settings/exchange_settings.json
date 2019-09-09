@@ -5,14 +5,16 @@
     "API_SECRET": "T5t1bugZFKUHJLXQB3JlhHy3pD7GxfzaqanWREv4LYF6Ld_r",
     "API_URL": "/api/v1/",
     "BASE_URL": "https://testnet.bitmex.com",
+    "EXCHANGE": "bitmex",
     "LOOP_INTERVAL": 5
   },
   {
     "py/object": "models.settings.ExchangeSettings",
-    "API_KEY": "Y3sFiwog46-1qtsxPCoK0Gpu",
-    "API_SECRET": "pN9kRI_7ucOmNz6L9K79_S1meKQP2aoBxsjIpMBY-xbTSB_2",
-    "API_URL": "/api/v1/",
-    "BASE_URL": "https://www.bitmex.com",
-    "LOOP_INTERVAL": 3
+    "API_KEY": "PECVYbnc5MVY",
+    "API_SECRET": "CTHFYREWTGM23HCJREQTPEF4Q7VQLEIX",
+    "API_URL": "/api/v2/",
+    "BASE_URL": "https://test.deribit.com",
+    "EXCHANGE": "deribit",
+    "LOOP_INTERVAL": 5
   }
 ]

@@ -7,13 +7,15 @@ settings = [{
     "API_SECRET": "T5t1bugZFKUHJLXQB3JlhHy3pD7GxfzaqanWREv4LYF6Ld_r",
     "BASE_URL": "https://testnet.bitmex.com",
     "API_URL": "/api/v1/",
-    "LOOP_INTERVAL": 5
+    "LOOP_INTERVAL": 5,
+    "EXCHANGE": "bitmex"
 }, {
     "API_KEY": "Y3sFiwog46-1qtsxPCoK0Gpu",
     "API_SECRET": "pN9kRI_7ucOmNz6L9K79_S1meKQP2aoBxsjIpMBY-xbTSB_2",
     "BASE_URL": "https://www.bitmex.com",
     "API_URL": "/api/v1/",
-    "LOOP_INTERVAL": 5
+    "LOOP_INTERVAL": 5,
+    "EXCHANGE": "bitmex"
 }]
 
 testdata = [ExchangeSettings(**setting) for setting in settings]

@@ -32,10 +32,12 @@ class ExchangeSettings:
                  API_SECRET,
                  BASE_URL,
                  API_URL,
-                 LOOP_INTERVAL
+                 LOOP_INTERVAL,
+                 EXCHANGE
                  ):
         self.API_KEY = API_KEY
         self.API_SECRET = API_SECRET
         self.BASE_URL = BASE_URL
         self.API_URL = API_URL
         self.LOOP_INTERVAL = LOOP_INTERVAL
+        self.EXCHANGE = EXCHANGE

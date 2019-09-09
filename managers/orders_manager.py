@@ -1,4 +1,5 @@
-from bitmex.exchange import ExchangeInterface
+from bitmex.exchange import BitmexExchangeInterface
+from deribit.exchange_v2 import DeribitExchangeInterface
 import jsonpickle
 import asyncio
 
@@ -13,11 +14,15 @@ class OrdersManager:
         self.GRID_SIDE = self.orders_сalculator.GRID_SIDE
         self.settings = self.load_settings()
         self.LOOP_INTERVAL = self.settings.LOOP_INTERVAL
-        self.exchange = ExchangeInterface(key=self.settings.API_KEY,
-                                          secret=self.settings.API_SECRET,
-                                          base_url=self.settings.BASE_URL,
-                                          api_url=self.settings.API_URL,
-                                          instrument=self.orders_сalculator.SYMBOL)
+        self.exchanges = {
+            'bitmex': BitmexExchangeInterface,
+            'deribit': DeribitExchangeInterface
+        }
+        self.exchange = self.exchanges[self.settings.EXCHANGE](key=self.settings.API_KEY,
+                                                               secret=self.settings.API_SECRET,
+                                                               base_url=self.settings.BASE_URL,
+                                                               api_url=self.settings.API_URL,
+                                                               instrument=self.orders_сalculator.SYMBOL)
 
     def load_settings(self, file=None):
         testdata_file = f'{file}.json' if file else f'{self.file_settings}.json'
