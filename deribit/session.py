@@ -9,7 +9,6 @@ class Session():
         self.base_url = base_url
         self.api_url = api_url
         self.url = base_url + api_url
-        self.currency = 'BTS'
         self.access_token = None
         self.refresh_token = None
         self.expires_in = 0
@@ -22,9 +21,7 @@ class Session():
             'client_id': self.key,
             'scope': 'session:micropython'
         }
-
         response = self.post(method, params)
-        print(response)
         if response:
             self.access_token = response['access_token']
             self.refresh_token = response['refresh_token']
@@ -43,5 +40,8 @@ class Session():
             headers['Authorization'] = 'Bearer {}'.format(self.access_token)
 
         response = requests.post(url=url, headers=headers, json=data)
-        if response.status_code == 200:
-            return response.json()['result']
+
+        if response.status_code != 200:
+            raise Exception("Wrong response code: {0}".format(response.status_code))
+
+        return response.json()['result']
