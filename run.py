@@ -2,6 +2,7 @@
 from managers.orders_manager import OrdersManager
 from managers.bots_manager import BotsManager
 import asyncio
+from utils import log
 
 bots = BotsManager()
 orders_managers = [OrdersManager(сalc) for сalc in bots.get_orders_сalculators()]

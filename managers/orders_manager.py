@@ -2,7 +2,8 @@ from bitmex.exchange import BitmexExchangeInterface
 from deribit.exchange_v2 import DeribitExchangeInterface
 import jsonpickle
 import asyncio
-from utils import log
+import logging
+
 
 class OrdersManager:
 
@@ -22,7 +23,9 @@ class OrdersManager:
                                                                base_url=self.settings.BASE_URL,
                                                                api_url=self.settings.API_URL,
                                                                instrument=self.orders_сalculator.SYMBOL)
-        self.logger = log.setup_custom_logger(self.API_KEY)
+        self.logger = logging.getLogger(f'{__name__}.{self.API_KEY}')
+        log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        logging.basicConfig(format=log_format, level=logging.INFO)
         
         
     def load_settings(self, file=None):
@@ -60,7 +63,8 @@ class OrdersManager:
                 self.replace_orders(orders_for_update['to_create'],
                                     orders_for_update['to_cancel'])
             except Exception as r:
-                print(r)
+                self.logger.info(self.API_KEY)
+                self.logger.info(r)
             await asyncio.sleep(self.LOOP_INTERVAL)
 
 

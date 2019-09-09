@@ -1,5 +1,6 @@
 from models.states import OrderSide
-from utils import log
+import logging
+
 
 class AveragePrice:
 
@@ -15,7 +16,9 @@ class AveragePrice:
         self.orders = {}
         self.orders[OrderSide.sell] = {}
         self.orders[OrderSide.buy] = {}
-        self.logger = log.setup_custom_logger(self.API_KEY)
+        self.logger = logging.getLogger(f'{__name__}.{self.API_KEY}')
+        log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        logging.basicConfig(format=log_format, level=logging.INFO)
 
     def get_api_key(self):
         return self.API_KEY
@@ -84,12 +87,12 @@ class AveragePrice:
             self.existing_orders_price = self.get_orders_price(self.open_orders)
             self.design_orders_price = \
                 self.get_orders_price([order for order in self.orders.values()])
+            # self.logger.info("recalculation price: {}".
+            #       format(not self.orders_is_converge() or self.over_price()))
             return True
 
     def update(self, kw):
         if self.unpack(kw) and (self.over_price() or not self.orders_is_converge()):
-            self.logger.info("recalculation price: {}".
-                  format(not self.orders_is_converge() or self.over_price()))
             self.logger.info("existing_orders_price: {}".format(self.existing_orders_price))
             self.logger.info("design_orders_price: {}".format(self.design_orders_price))
             to_cancel = self.open_orders
