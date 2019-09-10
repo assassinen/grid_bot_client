@@ -6,16 +6,20 @@ class GridSettings:
                  API_KEY,
                  ORDER_SPREAD,
                  ORDER_STEP,
+                 START_STEP,
+                 FREQUENCY_RATE,
                  ORDER_SIZE,
                  GRID_DEPTH,
                  GRID_SIDE,
                  SYMBOL,
                  strategy='average_price',
-                 active=True
+                 active=False
                  ):
         self.API_KEY = API_KEY
         self.ORDER_SPREAD = ORDER_SPREAD
         self.ORDER_STEP = ORDER_STEP
+        self.START_STEP = START_STEP
+        self.FREQUENCY_RATE = FREQUENCY_RATE
         self.ORDER_SIZE = ORDER_SIZE
         self.GRID_DEPTH = GRID_DEPTH
         self.GRID_SIDE = GRID_SIDE

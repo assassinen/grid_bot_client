@@ -77,24 +77,24 @@ class OrdersManager:
 
 
     def replace_orders(self, to_create, to_cancel):
+        if self.is_not_correct(to_create):
+            return
+
         if len(to_cancel) > 0:
             self.logger.info("Canceling %d orders:" % (len(to_cancel)))
             for order in to_cancel:
-                self.logger.info("%4s %d @ %d" % (
+                self.logger.info("%4s %d @ %.2f" % (
                 order['side'], order['orderQty'], order['price']))
             self.exchange.cancel_all_orders()
-
-        if self.is_not_correct(to_create):
-            return
 
         if len(to_create) > 0:
             self.logger.info("Creating %d orders:" % (len(to_create)))
             for order in to_create:
                 responce = self.exchange.create_order(order)
                 if 'orderID' in responce:
-                    self.logger.info("%4s %d @ %d" % (
+                    self.logger.info("%4s %d @ %.2f" % (
                         responce['side'], responce['orderQty'], responce['price']))
                 if 'order' in responce:
                     order = responce['order']
-                    self.logger.info("%4s %d @ %d" % (
+                    self.logger.info("%4s %d @ %.2f" % (
                         order['direction'], order['amount'], order['price']))

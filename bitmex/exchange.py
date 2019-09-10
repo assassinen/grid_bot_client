@@ -37,7 +37,7 @@ class BitmexExchangeInterface:
                 '&symbol={}'.format(self.instrument)
 
         open_orders = self.session.get('order', query)
-        return [{'price': round(order['price']),
+        return [{'price': order['price'],
                  'orderQty': order['orderQty'],
                  'side': order['side']}
                 for order in open_orders]

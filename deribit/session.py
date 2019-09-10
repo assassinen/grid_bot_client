@@ -1,6 +1,6 @@
 import requests
 import time
-
+import logging
 
 class Session():
     def __init__(self, key, secret, base_url, api_url):
@@ -12,6 +12,10 @@ class Session():
         self.access_token = None
         self.refresh_token = None
         self.expires_in = 0
+
+        self.logger = logging.getLogger(f'session.{self.key}')
+        log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        logging.basicConfig(format=log_format, level=logging.INFO)
 
     def auth(self):
         method = 'public/auth'
@@ -39,7 +43,11 @@ class Session():
         if method.startswith('private'):
             headers['Authorization'] = 'Bearer {}'.format(self.access_token)
 
-        response = requests.post(url=url, headers=headers, json=data)
+        try:
+            # self.logger.info("connect to: {}".format(url))
+            response = requests.post(url=url, headers=headers, json=data)
+        except Exception as r:
+            self.logger.info(r)
 
         if response.status_code != 200:
             raise Exception("Wrong response code: {0}".format(response.status_code))

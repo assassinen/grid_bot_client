@@ -8,6 +8,8 @@ class AveragePrice:
         self.API_KEY = settings.API_KEY
         self.ORDER_SPREAD = settings.ORDER_SPREAD
         self.ORDER_STEP = settings.ORDER_STEP
+        self.START_STEP = settings.START_STEP
+        self.FREQUENCY_RATE = settings.FREQUENCY_RATE
         self.ORDER_SIZE = settings.ORDER_SIZE
         self.GRID_DEPTH = settings.GRID_DEPTH
         self.GRID_SIDE = settings.GRID_SIDE
@@ -35,7 +37,8 @@ class AveragePrice:
 
     def get_price(self, side, price=None):
         ratio = 1 if side == OrderSide.sell else -1
-        delta = self.ORDER_STEP * ratio if side == self.GRID_SIDE else self.ORDER_SPREAD * ratio
+        step = self.START_STEP if self.positions['size'] == 0 else self.ORDER_STEP
+        delta = step * ratio if side == self.GRID_SIDE else self.ORDER_SPREAD * ratio
         price = round(price) if price else self.last_trade_price
         return (min(price, self.last_trade_price) + delta if side == OrderSide.buy else
                 max(price, self.last_trade_price) + delta)
@@ -46,6 +49,11 @@ class AveragePrice:
         return False if len(open_order) <= 0 \
             else (abs(self.get_price(side) - open_order[0]['price']) >= self.ORDER_STEP * 2)
 
+    def round_price(self, price):
+        multiplier = 1000
+        frequency_rate = multiplier * self.FREQUENCY_RATE
+        return price * multiplier // frequency_rate * frequency_rate / multiplier
+
     def create_grid_order(self):
         side = self.GRID_SIDE
         price = self.get_price(side)
@@ -54,7 +62,7 @@ class AveragePrice:
             last_order_price = self.last_order_price
             price = self.get_price(side, last_order_price)
         size = self.ORDER_SIZE
-        order = {"price": int(price),
+        order = {"price": self.round_price(price),
                  "orderQty": size,
                  "side": side}
         return order
