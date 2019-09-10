@@ -45,6 +45,7 @@ class DeribitExchangeInterface:
             'amount': order['orderQty'],
             'price': order['price'],
             'postOnly': 'true',
+            'time_in_force': 'good_til_cancelled',
             'type': 'limit'
         }
         result = self.session.post(method, params)
