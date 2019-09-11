@@ -44,7 +44,7 @@ class DeribitExchangeInterface:
             'instrument_name': self.instrument,
             'amount': order['orderQty'],
             'price': order['price'],
-            'postOnly': 'true',
+            'post_only': 'true',
             'time_in_force': 'good_til_cancelled',
             'type': 'limit'
         }
