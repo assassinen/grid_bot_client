@@ -37,7 +37,7 @@ class AveragePrice:
         ratio = 1 if side == OrderSide.sell else -1
         step = self.START_STEP if self.positions['size'] == 0 else self.ORDER_STEP
         delta = step * ratio if side == self.GRID_SIDE else self.ORDER_SPREAD * ratio
-        price = price if price else self.last_trade_price
+        price = self.round_price(price) if price else self.last_trade_price
         return (min(price, self.last_trade_price) + delta if side == OrderSide.buy else
                 max(price, self.last_trade_price) + delta)
 
@@ -60,7 +60,7 @@ class AveragePrice:
             last_order_price = self.last_order_price
             price = self.get_price(side, last_order_price)
         size = self.ORDER_SIZE
-        order = {"price": self.round_price(price),
+        order = {"price": price,
                  "orderQty": size,
                  "side": side}
         return order
