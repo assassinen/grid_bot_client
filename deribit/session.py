@@ -1,7 +1,7 @@
 import requests
 import time
 from models.log import setup_custom_logger
-
+16
 class Session():
     def __init__(self, key, secret, base_url, api_url):
         self.key = key
