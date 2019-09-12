@@ -3,7 +3,7 @@ import time
 import json
 import hmac
 import hashlib
-
+from models.log import setup_custom_logger
 
 class Session():
 
@@ -12,6 +12,7 @@ class Session():
         self.secret = secret
         self.base_url = base_url
         self.api_url = api_url
+        self.logger = setup_custom_logger(f'session.{self.key}')
 
     def generate_signature(self, expires, metod, path, data=None):
         """Generate a request signature compatible with BitMEX."""
@@ -32,12 +33,15 @@ class Session():
         path = self.api_url + action + query
         url = self.base_url + path
         headers = self.get_headers(metod, path, data)
-        if metod == 'GET':
-            response = requests.get(url=url, headers=headers)
-        if metod == 'POST':
-            response = requests.post(url=url, headers=headers, json=data)
-        if metod == 'DELETE':
-            response = requests.delete(url=url, headers=headers, json=data)
+        try:
+            if metod == 'GET':
+                response = requests.get(url=url, headers=headers)
+            if metod == 'POST':
+                response = requests.post(url=url, headers=headers, json=data)
+            if metod == 'DELETE':
+                response = requests.delete(url=url, headers=headers, json=data)
+        except Exception as r:
+            self.logger.info(r)
 
         if response.status_code != 200:
             raise Exception("Wrong response code: {0}".format(response.status_code))

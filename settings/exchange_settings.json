@@ -25,5 +25,14 @@
     "BASE_URL": "https://www.deribit.com",
     "EXCHANGE": "deribit",
     "LOOP_INTERVAL": 5
+  },
+  {
+    "py/object": "models.settings.ExchangeSettings",
+    "API_KEY": "KRwNOPyb",
+    "API_SECRET": "jsY2UvGu2Pu65jSRSJVq2HBkD81WC2-K8LY1GFCrl0M",
+    "API_URL": "/api/v2/",
+    "BASE_URL": "https://www.deribit.com",
+    "EXCHANGE": "deribit",
+    "LOOP_INTERVAL": 5
   }
 ]

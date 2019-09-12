@@ -1,6 +1,6 @@
 import requests
 import time
-import logging
+from models.log import setup_custom_logger
 
 class Session():
     def __init__(self, key, secret, base_url, api_url):
@@ -12,10 +12,7 @@ class Session():
         self.access_token = None
         self.refresh_token = None
         self.expires_in = 0
-
-        self.logger = logging.getLogger(f'session.{self.key}')
-        log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-        logging.basicConfig(format=log_format, level=logging.INFO)
+        self.logger = setup_custom_logger(f'session.{self.key}')
 
     def auth(self):
         method = 'public/auth'
@@ -44,7 +41,6 @@ class Session():
             headers['Authorization'] = 'Bearer {}'.format(self.access_token)
 
         try:
-            # self.logger.info("connect to: {}".format(url))
             response = requests.post(url=url, headers=headers, json=data)
         except Exception as r:
             self.logger.info(r)

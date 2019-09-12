@@ -1,6 +1,5 @@
 from models.states import OrderSide
-import logging
-
+from models.log import setup_custom_logger
 
 class AveragePrice:
 
@@ -18,9 +17,8 @@ class AveragePrice:
         self.orders = {}
         self.orders[OrderSide.sell] = {}
         self.orders[OrderSide.buy] = {}
-        self.logger = logging.getLogger(f'average_price.{self.API_KEY}')
-        log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-        logging.basicConfig(format=log_format, level=logging.INFO)
+        self.logger = setup_custom_logger(f'average_price.{self.API_KEY}')
+
 
     def get_api_key(self):
         return self.API_KEY
@@ -93,7 +91,7 @@ class AveragePrice:
             self.last_trade_price = kw['last_trade_price']
             self.last_order_price = kw['last_order_price']
             self.existing_orders_price = self.get_orders_price(self.open_orders)
-            self.x = \
+            self.design_orders_price = \
                 self.get_orders_price([order for order in self.orders.values()])
             return True
 

@@ -2,7 +2,7 @@ from bitmex.exchange import BitmexExchangeInterface
 from deribit.exchange_v2 import DeribitExchangeInterface
 import jsonpickle
 import asyncio
-import logging
+from models.log import setup_custom_logger
 
 
 class OrdersManager:
@@ -23,10 +23,7 @@ class OrdersManager:
                                                                base_url=self.settings.BASE_URL,
                                                                api_url=self.settings.API_URL,
                                                                instrument=self.orders_сalculator.SYMBOL)
-        self.logger = logging.getLogger(f'orders_manager.{self.API_KEY}')
-        log_format = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-        logging.basicConfig(format=log_format, level=logging.INFO)
-        
+        self.logger = setup_custom_logger(f'orders_manager.{self.API_KEY}')
         
     def load_settings(self, file=None):
         testdata_file = f'{file}.json' if file else f'{self.file_settings}.json'
