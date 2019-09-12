@@ -19,7 +19,6 @@ class AveragePrice:
         self.orders[OrderSide.buy] = {}
         self.logger = setup_custom_logger(f'average_price.{self.API_KEY}')
 
-
     def get_api_key(self):
         return self.API_KEY
 
@@ -37,9 +36,10 @@ class AveragePrice:
         ratio = 1 if side == OrderSide.sell else -1
         step = self.START_STEP if self.positions['size'] == 0 else self.ORDER_STEP
         delta = step * ratio if side == self.GRID_SIDE else self.ORDER_SPREAD * ratio
-        price = self.round_price(price) if price else self.last_trade_price
-        return (min(price, self.last_trade_price) + delta if side == OrderSide.buy else
-                max(price, self.last_trade_price) + delta)
+        price = price if price else self.last_trade_price
+        return self.round_price(min(price, self.last_trade_price) + delta) \
+               if side == OrderSide.buy else \
+               self.round_price(max(price, self.last_trade_price) + delta)
 
     def over_price(self):
         side = self.GRID_SIDE
