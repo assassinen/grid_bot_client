@@ -44,14 +44,6 @@ class AveragePrice:
     def over_price(self):
         side = self.GRID_SIDE
         open_order = self.get_order_by_side(side)
-        over_price = False if len(open_order) <= 0 \
-            else (abs(self.get_price(side) - open_order[0]['price']) >= self.ORDER_STEP * 2)
-        self.logger.info("over_price {}".format(over_price))
-        self.logger.info("double order step {}".format(self.ORDER_STEP * 2))
-        self.logger.info("self open orders {}".format(self.open_orders))
-        if len(open_order) > 0:
-            self.logger.info("open order price {}".format(open_order[0]['price']))
-        self.logger.info("get order price {}".format(self.get_price(side)))
         return False if len(open_order) <= 0 \
             else (abs(self.get_price(side) - open_order[0]['price']) >= self.ORDER_STEP * 2)
 

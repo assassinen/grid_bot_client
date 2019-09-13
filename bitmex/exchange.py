@@ -39,13 +39,13 @@ class BitmexExchangeInterface:
         open_orders = self.session.get('order', query)
         return [{'price': order['price'],
                  'orderQty': order['orderQty'],
-                 'side': order['side']}
+                 'side': order['side'].lower()}
                 for order in open_orders]
 
     def create_order(self, order=''):
         postdict = {
             'symbol': self.instrument,
-            'side': order['side'],
+            'side': order['side'].title(),
             'orderQty': order['orderQty'],
             'price': order['price'],
             'ordType': 'Limit',
