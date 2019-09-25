@@ -70,12 +70,10 @@ class OrdersManager:
                                   if order['side'] != self.GRID_SIDE])
         positions_qty = self.get_positions()['size']
 
-        return reverse_orders_qty > positions_qty
+        return reverse_orders_qty != 0 and reverse_orders_qty > positions_qty
 
 
     def replace_orders(self, to_create, to_cancel):
-        if self.is_not_correct(to_create):
-            return
 
         if len(to_cancel) > 0:
             self.logger.info("Canceling %d orders:" % (len(to_cancel)))
@@ -83,6 +81,9 @@ class OrdersManager:
                 self.logger.info("%4s %d @ %.2f" % (
                 order['side'], order['orderQty'], order['price']))
             self.exchange.cancel_all_orders()
+
+        if self.is_not_correct(to_create):
+            return
 
         if len(to_create) > 0:
             self.logger.info("Creating %d orders:" % (len(to_create)))
