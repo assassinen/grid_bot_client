@@ -44,7 +44,7 @@ class AveragePrice:
     def over_price(self):
         side = self.GRID_SIDE
         open_order = self.get_order_by_side(side)
-        return False if len(open_order) <= 0 \
+        return False if len(open_order) <= 0 or self.positions['size'] > 0 \
             else (abs(self.get_price(side) - open_order[0]['price']) >= self.ORDER_STEP * 2)
 
     def round_price(self, price):
