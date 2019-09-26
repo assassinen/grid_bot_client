@@ -69,7 +69,6 @@ class OrdersManager:
         reverse_orders_qty = sum([order['orderQty'] for order in to_create
                                   if order['side'] != self.GRID_SIDE])
         positions_qty = self.get_positions()['size']
-
         return reverse_orders_qty != 0 and reverse_orders_qty > positions_qty
 
 
@@ -91,8 +90,8 @@ class OrdersManager:
                 responce = self.exchange.create_order(order)
                 if 'orderID' in responce:
                     self.logger.info("%4s %d @ %.2f" % (
-                        responce['side'], responce['orderQty'], responce['price']))
+                        responce['side'].lower(), responce['orderQty'], responce['price']))
                 if 'order' in responce:
                     order = responce['order']
                     self.logger.info("%4s %d @ %.2f" % (
-                        order['direction'], order['amount'], order['price']))
+                        order['direction'].lower(), order['amount'], order['price']))
