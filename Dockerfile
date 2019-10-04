@@ -6,4 +6,4 @@ COPY . /grid_client
 RUN pip install --upgrade pip
 RUN pip install --no-cache-dir -r requirements.txt
 
-CMD python3 run.pyp
+CMD python3 run.py
