@@ -26,6 +26,53 @@
     "FREQUENCY_RATE": 0.05,
     "REVERSE_SIDE": "sell",
     "SYMBOL": "ETH-PERPETUAL",
+    "active": false,
+    "strategy": "average_price"
+  }
+
+,
+  {
+    "py/object": "models.settings.GridSettings",
+    "API_KEY": "Bz9kSqYSnfpGVxiU146UPnzf",
+    "GRID_DEPTH": 100,
+    "GRID_SIDE": "buy",
+    "ORDER_SIZE": 100,
+    "ORDER_SPREAD": 2,
+    "ORDER_STEP": 1,
+    "START_STEP": 0.5,
+    "FREQUENCY_RATE": 0.5,
+    "REVERSE_SIDE": "sell",
+    "SYMBOL": "XBTUSD",
+    "active": true,
+    "strategy": "average_price"
+  },
+  {
+    "py/object": "models.settings.GridSettings",
+    "API_KEY": "N2XqIwOgxgLpyt-sQv2wfvtvFq0",
+    "GRID_DEPTH": 50,
+    "GRID_SIDE": "buy",
+    "ORDER_SIZE": 100,
+    "ORDER_SPREAD": 0.5,
+    "ORDER_STEP": 0.5,
+    "START_STEP": 0.5,
+    "FREQUENCY_RATE": 0.05,
+    "REVERSE_SIDE": "sell",
+    "SYMBOL": "ETHUSD",
+    "active": false,
+    "strategy": "average_price"
+  },
+  {
+    "py/object": "models.settings.GridSettings",
+    "API_KEY": "fV0VYpueS88WOhOhOCRSn4X2",
+    "GRID_DEPTH": 100,
+    "GRID_SIDE": "sell",
+    "ORDER_SIZE": 100,
+    "ORDER_SPREAD": 2,
+    "ORDER_STEP": 1,
+    "START_STEP": 0.5,
+    "FREQUENCY_RATE": 0.5,
+    "REVERSE_SIDE": "buy",
+    "SYMBOL": "XBTZ19",
     "active": true,
     "strategy": "average_price"
   }

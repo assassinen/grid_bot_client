@@ -56,6 +56,7 @@ class OrdersManager:
         while True:
             try:
                 kw = self.get_data_for_orders_сalculator()
+                # print(kw)
                 orders_for_update = self.orders_сalculator.update(kw)
                 self.replace_orders(orders_for_update['to_create'],
                                     orders_for_update['to_cancel'])
