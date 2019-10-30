@@ -16,32 +16,5 @@
     "BASE_URL": "https://test.deribit.com",
     "EXCHANGE": "deribit",
     "LOOP_INTERVAL": 10
-  },
-  {
-    "py/object": "models.settings.ExchangeSettings",
-    "API_KEY": "Bz9kSqYSnfpGVxiU146UPnzf",
-    "API_SECRET": "a-OlPyHqKOutmFHs8jCGiEw_TZoHiFynZYJtJFbmORbgKOkO",
-    "API_URL": "/api/v1/",
-    "BASE_URL": "https://testnet.bitmex.com",
-    "EXCHANGE": "bitmex",
-    "LOOP_INTERVAL": 5
-  },
-  {
-    "py/object": "models.settings.ExchangeSettings",
-    "API_KEY": "N2XqIwOgxgL-sQv2wfvtvFq0",
-    "API_SECRET": "Ea9UjdLYi0L2QmOgY9XWTsxeEs5EEsVVvRoGOBB4_5ufjWmv",
-    "API_URL": "/api/v1/",
-    "BASE_URL": "https://testnet.bitmex.com",
-    "EXCHANGE": "bitmex",
-    "LOOP_INTERVAL": 5
-  },
-  {
-    "py/object": "models.settings.ExchangeSettings",
-    "API_KEY": "fV0VYpueS88WOhOhOCRSn4X2",
-    "API_SECRET": "kges8DJUd_GveiEWg9GjOHpdBjT_2gJfzygRDaAA9LYjhUo0",
-    "API_URL": "/api/v1/",
-    "BASE_URL": "https://testnet.bitmex.com",
-    "EXCHANGE": "bitmex",
-    "LOOP_INTERVAL": 5
   }
 ]

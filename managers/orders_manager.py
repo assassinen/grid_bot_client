@@ -82,8 +82,8 @@ class OrdersManager:
                 order['side'], order['orderQty'], order['price']))
             self.exchange.cancel_all_orders()
 
-        if self.is_not_correct(to_create):
-            return
+        # if self.is_not_correct(to_create):
+        #     return
 
         if len(to_create) > 0:
             self.logger.info("Creating %d orders:" % (len(to_create)))
