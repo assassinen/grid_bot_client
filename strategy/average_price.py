@@ -112,4 +112,3 @@ class AveragePrice:
             return {'to_create': to_create, 'to_cancel': to_cancel}
         else:
             return {'to_create': [], 'to_cancel': []}
-
