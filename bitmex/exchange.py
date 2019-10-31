@@ -56,5 +56,3 @@ class BitmexExchangeInterface:
     def cancel_all_orders(self):
         postdict = {'symbol': self.instrument}
         return self.session.delete('order/all', postdict)
-
-
