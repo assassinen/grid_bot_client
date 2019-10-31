@@ -55,3 +55,4 @@ class Session():
 
     def delete(self, action, postdict):
         return self.request('DELETE', action, data=postdict)
+
