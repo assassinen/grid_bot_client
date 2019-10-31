@@ -56,3 +56,4 @@ class DeribitExchangeInterface:
         params = {'instrument_name': self.instrument, 'type': 'all'}
         result = self.session.post(method, params)
         return result
+
