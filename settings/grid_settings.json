@@ -3,15 +3,15 @@
     "py/object": "models.settings.GridSettings",
     "API_KEY": "EDwDQjVbWdHgNa5V-duD1eKD",
     "GRID_DEPTH": 7,
-    "GRID_SIDE": "buy",
+    "GRID_SIDE": "sell",
     "ORDER_SIZE": 50,
     "ORDER_SPREAD": 10,
     "ORDER_STEP": 30,
     "START_STEP": 5,
     "FREQUENCY_RATE": 0.5,
-    "REVERSE_SIDE": "sell",
+    "REVERSE_SIDE": "buy",
     "SYMBOL": "XBTUSD",
-    "active": false,
+    "active": true,
     "strategy": "average_price"
   },
   {
@@ -26,7 +26,7 @@
     "FREQUENCY_RATE": 0.05,
     "REVERSE_SIDE": "sell",
     "SYMBOL": "ETH-PERPETUAL",
-    "active": true,
+    "active": false,
     "strategy": "average_price"
   }
 ]

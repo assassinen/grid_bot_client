@@ -76,7 +76,7 @@ class AveragePrice:
     def update_reverse_orders(self):
         side = self.REVERSE_SIDE
         price = self.positions['average_price']
-        size = self.positions['size']
+        size = -self.positions['size']
         if size > 0:
             order = {"price": self.get_price(side, price),
                      "orderQty": size,
