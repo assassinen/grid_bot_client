@@ -1,9 +1,15 @@
 from models.states import OrderSide
 
-class GridSettings:
+
+class Settings:
 
     def __init__(self,
                  API_KEY,
+                 API_SECRET,
+                 BASE_URL,
+                 API_URL,
+                 LOOP_INTERVAL,
+                 EXCHANGE,
                  ORDER_SPREAD,
                  ORDER_STEP,
                  START_STEP,
@@ -16,6 +22,11 @@ class GridSettings:
                  active=False
                  ):
         self.API_KEY = API_KEY
+        self.API_SECRET = API_SECRET
+        self.BASE_URL = BASE_URL
+        self.API_URL = API_URL
+        self.LOOP_INTERVAL = LOOP_INTERVAL
+        self.EXCHANGE = EXCHANGE
         self.ORDER_SPREAD = ORDER_SPREAD
         self.ORDER_STEP = ORDER_STEP
         self.START_STEP = START_STEP
@@ -28,20 +39,3 @@ class GridSettings:
         self.SYMBOL = SYMBOL
         self.strategy = strategy
         self.active = active
-
-class ExchangeSettings:
-
-    def __init__(self,
-                 API_KEY,
-                 API_SECRET,
-                 BASE_URL,
-                 API_URL,
-                 LOOP_INTERVAL,
-                 EXCHANGE
-                 ):
-        self.API_KEY = API_KEY
-        self.API_SECRET = API_SECRET
-        self.BASE_URL = BASE_URL
-        self.API_URL = API_URL
-        self.LOOP_INTERVAL = LOOP_INTERVAL
-        self.EXCHANGE = EXCHANGE

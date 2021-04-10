@@ -12,7 +12,7 @@ class DeribitExchangeInterface:
         params = {'instrument_name': self.instrument}
         result = self.session.post(method, params)
         return {'average_price': result.get('average_price'),
-                'size': result.get('size')}
+                'size': result.get('size', 0)}
 
     def get_last_trade_price(self):
         method = 'public/get_last_trades_by_instrument'
@@ -26,27 +26,46 @@ class DeribitExchangeInterface:
         last_order_price = [order['price'] for order
                             in self.session.post(method, params)
                             if order['direction'] == side]
-        return last_order_price[0] if len(last_order_price) > 0 \
-            else self.get_last_trade_price()
+        return last_order_price[0] if len(last_order_price) > 0 else self.get_last_trade_price()
+
+    def get_order_params_from_responce(self, responce):
+        return {'price': responce.get('price'),
+                'size': responce.get('amount'),
+                'side': responce.get('direction'),
+                'order_id': responce.get('order_id'),
+                'status': responce.get('order_state'),
+                'label': responce.get('label')}
 
     def get_open_orders(self):
         method = 'private/get_open_orders_by_instrument'
         params = {'instrument_name': self.instrument}
         open_orders = self.session.post(method, params)
-        return [{'price': order['price'],
-                 'orderQty': order['amount'],
-                 'side': order['direction']}
-                for order in open_orders]
+        return [self.get_order_params_from_responce(order) for order in open_orders]
+
+    def get_order_state(self, order_id):
+        method = 'private/get_order_state'
+        params = {'order_id': order_id}
+        order = self.session.post(method, params)
+        if order.get('order_state') is None:
+            order = {'order_id': order_id, 'order_state': 'cancelled'}
+        return self.get_order_params_from_responce(order)
+
+    def get_orders_state(self, orders_state):
+        open_orders = self.get_open_orders()
+        open_order_ids = [open_order.get('order_id') for open_order in open_orders]
+        order_state_ids = [order_id for order_id in orders_state if order_id not in open_order_ids]
+        return open_orders + [self.get_order_state(order_id) for order_id in order_state_ids]
 
     def create_order(self, order):
         method = 'private/buy' if order['side'] == OrderSide.buy else 'private/sell'
         params = {
             'instrument_name': self.instrument,
-            'amount': order['orderQty'],
+            'amount': order['size'],
             'price': order['price'],
             'post_only': 'true',
             'time_in_force': 'good_til_cancelled',
-            'type': 'limit'
+            'type': 'limit',
+            'label': order['label'],
         }
         result = self.session.post(method, params)
         return result

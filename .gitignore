@@ -21,6 +21,7 @@ cmake-build-release/
 out/
 
 # mpeltonen/sbt-idea plugin
+.idea
 .idea_modules/
 
 # JIRA plugin
@@ -128,11 +129,11 @@ env.bak/
 venv.bak/
 
 
-# Spyder project settings
+# Spyder project exchange_settings
 .spyderproject
 .spyproject
 
-# Rope project settings
+# Rope project exchange_settings
 .ropeproject
 
 # mkdocs documentation
