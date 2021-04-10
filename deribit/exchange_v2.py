@@ -33,7 +33,8 @@ class DeribitExchangeInterface:
                 'size': responce.get('amount'),
                 'side': responce.get('direction'),
                 'order_id': responce.get('order_id'),
-                'status': responce.get('order_state')}
+                'status': responce.get('order_state'),
+                'label': responce.get('label')}
 
     def get_open_orders(self):
         method = 'private/get_open_orders_by_instrument'
@@ -59,11 +60,12 @@ class DeribitExchangeInterface:
         method = 'private/buy' if order['side'] == OrderSide.buy else 'private/sell'
         params = {
             'instrument_name': self.instrument,
-            'amount': order['orderQty'],
+            'amount': order['size'],
             'price': order['price'],
             'post_only': 'true',
             'time_in_force': 'good_til_cancelled',
-            'type': 'limit'
+            'type': 'limit',
+            'label': order['label'],
         }
         result = self.session.post(method, params)
         return result

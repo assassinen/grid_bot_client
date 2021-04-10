@@ -117,7 +117,3 @@ class OrdersManager:
                 await asyncio.sleep(self.settings.LOOP_INTERVAL)
                 continue
             await asyncio.sleep(self.settings.LOOP_INTERVAL)
-
-
-class SetSettings(Exception):
-    pass
