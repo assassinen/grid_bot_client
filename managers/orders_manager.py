@@ -1,4 +1,5 @@
 import asyncio
+import os.path
 import requests
 import jsonpickle
 from bitmex.exchange import BitmexExchangeInterface
@@ -8,14 +9,8 @@ from models.log import setup_custom_logger
 
 class OrdersManager:
 
-    def __init__(self, grid_settings):
-        self.file_settings = 'settings/exchange_settings'
-        self.grid_settings = grid_settings
-        self.API_KEY = grid_settings.API_KEY
-        self.GRID_SIDE = grid_settings.GRID_SIDE
-
-        self.settings = self.load_settings()
-        self.LOOP_INTERVAL = self.settings.LOOP_INTERVAL
+    def __init__(self, settings):
+        self.settings = settings
         self.exchanges = {
             'bitmex': BitmexExchangeInterface,
             'deribit': DeribitExchangeInterface
@@ -24,25 +19,24 @@ class OrdersManager:
                                                                secret=self.settings.API_SECRET,
                                                                base_url=self.settings.BASE_URL,
                                                                api_url=self.settings.API_URL,
-                                                               instrument=self.grid_settings.SYMBOL)
+                                                               instrument=self.settings.SYMBOL)
         self.logger = setup_custom_logger(f'orders_manager.{self.settings.API_KEY}')
         self.orders_state = []
         self.base_url = 'http://moneyprinter.pythonanywhere.com/api/v1.0/'
-        self.orders_calculator_url = f'{self.base_url}orders_calculator/{self.API_KEY}:{self.grid_settings.SYMBOL}'
-        self.settings_url = f'{self.base_url}set_settings/{self.API_KEY}:{self.grid_settings.SYMBOL}'
+        # self.base_url = 'http://127.0.0.1:5000/api/v1.0/'
+        self.orders_calculator_url = f'{self.base_url}orders_calculator/{self.settings.API_KEY}:{self.settings.SYMBOL}'
+        self.set_settings_url = f'{self.base_url}set_settings/{self.settings.API_KEY}:{self.settings.SYMBOL}'
+        self.set_settings()
 
-
-    def load_settings(self, file=None):
-        testdata_file = f'{file}.json' if file else f'{self.file_settings}.json'
-        with open(testdata_file) as f:
+    def load_settings(self, file):
+        with open(f'{file}.json') as f:
             settings = [s for s in jsonpickle.decode(f.read())
                         if s.API_KEY == self.API_KEY]
             return settings[0]
 
-
     def get_data_for_calculations(self, orders_state):
         return {'last_prices': {'trade_price': self.exchange.get_last_trade_price(),
-                                'order_price': self.exchange.get_last_order_price(self.GRID_SIDE)},
+                                'order_price': self.exchange.get_last_order_price(self.settings.GRID_SIDE)},
                 'positions': self.exchange.get_positions(),
                 'active_orders': self.exchange.get_orders_state(orders_state)}
 
@@ -66,18 +60,18 @@ class OrdersManager:
         return orders_status
 
     def set_settings(self):
-        settings = {'api_key': self.grid_settings.API_KEY,
-                    'instrument': self.grid_settings.SYMBOL,
-                    'order_spread': self.grid_settings.ORDER_SPREAD,
-                    'order_step': self.grid_settings.ORDER_STEP,
-                    'start_step': self.grid_settings.START_STEP,
-                    'frequency_rate': self.grid_settings.FREQUENCY_RATE,
-                    'order_size': self.grid_settings.ORDER_SIZE,
-                    'grid_depth': self.grid_settings.GRID_DEPTH,
-                    'grid_side': self.grid_settings.GRID_SIDE}
-        result = requests.post(url=self.settings_url, json=settings)
+        settings = {'api_key': self.settings.API_KEY,
+                    'instrument': self.settings.SYMBOL,
+                    'order_spread': self.settings.ORDER_SPREAD,
+                    'order_step': self.settings.ORDER_STEP,
+                    'start_step': self.settings.START_STEP,
+                    'frequency_rate': self.settings.FREQUENCY_RATE,
+                    'order_size': self.settings.ORDER_SIZE,
+                    'grid_depth': self.settings.GRID_DEPTH,
+                    'grid_side': self.settings.GRID_SIDE}
+        result = requests.post(url=self.set_settings_url, json=settings)
         try:
-            if result.status_code == 200 and result.json().get('result') == 'settings are saved':
+            if result.status_code == 200 and result.json().get('result') == 'exchange_settings are saved':
                 self.logger.info('setting the bot parameters was successful')
         except:
             raise SetSettings(
@@ -89,11 +83,11 @@ class OrdersManager:
         try:
             status_code = orders_for_update.status_code
             result = orders_for_update.json().get('result')
-            if status_code == 400 and result == 'settings not found':
+            if status_code == 400 and result == 'exchange_settings not found':
                 self.logger.info(f'result: {result}')
                 self.set_settings()
                 raise SetSettings(
-                    f'the settings will be available in the next iteration'
+                    f'the exchange_settings will be available in the next iteration'
                 )
             else:
                 return orders_for_update.json()
@@ -101,24 +95,28 @@ class OrdersManager:
             raise err
 
 
-
     async def run_loop(self):
         while True:
             kw = self.get_data_for_calculations(self.orders_state)
-            print(kw)
+            # print(kw)
 
             self.logger.info(f"last_prices: {kw.get('last_prices')}")
             self.logger.info(f"positions: {kw.get('positions')}")
-            self.logger.info(f"active_orders: ")
+            self.logger.info("active_orders: ")
+            for order in kw.get("active_orders"):
+                self.logger.info(f"  {order}")
 
             try:
                 orders_for_update = self.get_orders_for_update(kw)
-                print(orders_for_update)
+                self.orders_state = orders_for_update.get('to_get_info') + \
+                                    self.replace_orders(orders_for_update.get('to_create'),
+                                                        orders_for_update.get('to_cancel'))
+                # print(self.orders_state)
             except Exception as err:
                 self.logger.info(f"{err}")
-                await asyncio.sleep(self.LOOP_INTERVAL)
+                await asyncio.sleep(self.settings.LOOP_INTERVAL)
                 continue
-            await asyncio.sleep(self.LOOP_INTERVAL)
+            await asyncio.sleep(self.settings.LOOP_INTERVAL)
 
 
 class SetSettings(Exception):

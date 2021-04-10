@@ -4,7 +4,7 @@ from managers.orders_manager import OrdersManager
 class BotsManager():
 
     def __init__(self):
-        self.file_settings = 'settings/grid_settings'
+        self.file_settings = 'settings/bot_settings'
         self.orders_managers = self.create_orders_manager()
 
     def load_settings(self, file=None):
