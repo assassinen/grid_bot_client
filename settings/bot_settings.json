@@ -36,7 +36,7 @@
     "FREQUENCY_RATE": 0.5,
     "REVERSE_SIDE": "buy",
     "SYMBOL": "BTC-PERPETUAL",
-    "active": false,
+    "active": true,
     "strategy": "average_price"
   }
 ]
