@@ -44,8 +44,9 @@ class DeribitExchangeInterface:
     def get_order_state(self, order_id):
         method = 'private/get_order_state'
         params = {'order_id': order_id}
-        order = self.session.post(method, params)
-        if order.get('order_state') is None:
+        try:
+            order = self.session.post(method, params)
+        except:
             order = {'order_id': order_id, 'order_state': 'cancelled'}
         return self.get_order_params_from_responce(order)
 
