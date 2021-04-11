@@ -45,7 +45,7 @@ class OrdersManager:
         if len(to_cancel) > 0:
             self.logger.info("Canceling %d orders:" % (len(to_cancel)))
             for order in to_cancel:
-                self.logger.info(f"{order}")
+                self.logger.info(f"  {order}")
                 # logger.info(f"{order['side']}, {order['size']}, {order['price']}")
             self.exchange.cancel_all_orders()
         if len(to_create) > 0:
@@ -55,7 +55,7 @@ class OrdersManager:
                 if 'order' in responce:
                     order = responce['order']
                     orders_status.append(order['order_id'])
-                    self.logger.info("%4s %d @ %.2f" % (
+                    self.logger.info("  %4s %d @ %.2f" % (
                         order['direction'].lower(), order['amount'], order['price']))
         return orders_status
 
@@ -89,8 +89,12 @@ class OrdersManager:
                 raise SetSettings(
                     f'the exchange_settings will be available in the next iteration'
                 )
-            else:
+            elif status_code == 200:
                 return orders_for_update.json()
+            else:
+                raise SetSettings(
+                    f'status_code: {status_code}'
+                )
         except Exception as err:
             raise err
 
@@ -98,7 +102,6 @@ class OrdersManager:
     async def run_loop(self):
         while True:
             kw = self.get_data_for_calculations(self.orders_state)
-            # print(kw)
 
             self.logger.info(f"last_prices: {kw.get('last_prices')}")
             self.logger.info(f"positions: {kw.get('positions')}")
@@ -117,3 +120,6 @@ class OrdersManager:
                 await asyncio.sleep(self.settings.LOOP_INTERVAL)
                 continue
             await asyncio.sleep(self.settings.LOOP_INTERVAL)
+
+class SetSettings(Exception):
+    pass
