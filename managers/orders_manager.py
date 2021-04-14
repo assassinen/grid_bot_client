@@ -111,9 +111,10 @@ class OrdersManager:
                     self.logger.info(f"  {order}")
 
                 orders_for_update = self.get_orders_for_update(kw)
-                for order in orders_for_update:
-                    self.logger.info("orders_for_update: ")
-                    self.logger.info(f"  {order}")
+                for k, v in orders_for_update.items():
+                    self.logger.info(f"{k}: ")
+                    for order in v:
+                        self.logger.info(f"  {order}")
 
                 self.orders_state = orders_for_update.get('to_get_info') + \
                                     self.replace_orders(orders_for_update.get('to_create'),
