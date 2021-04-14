@@ -101,20 +101,23 @@ class OrdersManager:
 
     async def run_loop(self):
         while True:
-            kw = self.get_data_for_calculations(self.orders_state)
-
-            self.logger.info(f"last_prices: {kw.get('last_prices')}")
-            self.logger.info(f"positions: {kw.get('positions')}")
-            self.logger.info("active_orders: ")
-            for order in kw.get("active_orders"):
-                self.logger.info(f"  {order}")
-
             try:
+                kw = self.get_data_for_calculations(self.orders_state)
+
+                self.logger.info(f"last_prices: {kw.get('last_prices')}")
+                self.logger.info(f"positions: {kw.get('positions')}")
+                self.logger.info("active_orders: ")
+                for order in kw.get("active_orders"):
+                    self.logger.info(f"  {order}")
+
                 orders_for_update = self.get_orders_for_update(kw)
+                for order in orders_for_update:
+                    self.logger.info("orders_for_update: ")
+                    self.logger.info(f"  {order}")
+
                 self.orders_state = orders_for_update.get('to_get_info') + \
                                     self.replace_orders(orders_for_update.get('to_create'),
                                                         orders_for_update.get('to_cancel'))
-                # print(self.orders_state)
             except Exception as err:
                 self.logger.info(f"{err}")
                 await asyncio.sleep(self.settings.LOOP_INTERVAL)
