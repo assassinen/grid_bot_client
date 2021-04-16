@@ -52,7 +52,8 @@ class Session():
         return self.request('GET', action, query)
 
     def post(self, action, postdict):
-        return self.request('POST', action, data=postdict)
+        result = self.request('POST', action, data=postdict)
+        return result
 
     def delete(self, action, postdict):
         return self.request('DELETE', action, data=postdict)

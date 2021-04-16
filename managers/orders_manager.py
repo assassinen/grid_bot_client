@@ -22,8 +22,8 @@ class OrdersManager:
                                                                instrument=self.settings.SYMBOL)
         self.logger = setup_custom_logger(f'orders_manager.{self.settings.API_KEY}')
         self.orders_state = []
-        self.base_url = 'http://moneyprinter.pythonanywhere.com/api/v1.0/'
-        # self.base_url = 'http://127.0.0.1:5000/api/v1.0/'
+        # self.base_url = 'http://moneyprinter.pythonanywhere.com/api/v1.0/'
+        self.base_url = 'http://127.0.0.1:5000/api/v1.0/'
         self.orders_calculator_url = f'{self.base_url}orders_calculator/{self.settings.API_KEY}:{self.settings.SYMBOL}'
         self.set_settings_url = f'{self.base_url}set_settings/{self.settings.API_KEY}:{self.settings.SYMBOL}'
         self.set_settings()
@@ -39,7 +39,8 @@ class OrdersManager:
                 'active_orders': self.exchange.get_orders_state(orders_state),
                 'last_prices': {'trade_price': self.exchange.get_last_trade_price(),
                                 'order_price': self.exchange.get_last_order_price(self.settings.GRID_SIDE)},
-                'positions': self.exchange.get_positions()}
+                'positions': self.exchange.get_positions()
+        }
 
     def replace_orders(self, to_create, to_cancel):
         orders_status = []
