@@ -44,7 +44,7 @@ class Session():
             self.logger.info(r)
 
         if response.status_code != 200:
-            raise Exception(f"Wrong response code: {response.status_code}"
+            raise Exception(f"Wrong response code: {response.status_code} "
                             f"Text: {response.text}")
         return response.json()
 

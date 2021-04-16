@@ -35,7 +35,8 @@ class OrdersManager:
             return settings[0]
 
     def get_data_for_calculations(self, orders_state):
-        return {'active_orders': self.exchange.get_orders_state(orders_state),
+        return {
+                'active_orders': self.exchange.get_orders_state(orders_state),
                 'last_prices': {'trade_price': self.exchange.get_last_trade_price(),
                                 'order_price': self.exchange.get_last_order_price(self.settings.GRID_SIDE)},
                 'positions': self.exchange.get_positions()}
@@ -46,7 +47,6 @@ class OrdersManager:
             self.logger.info("Canceling %d orders:" % (len(to_cancel)))
             for order in to_cancel:
                 self.logger.info(f"  {order}")
-                # logger.info(f"{order['side']}, {order['size']}, {order['price']}")
             self.exchange.cancel_all_orders()
         if len(to_create) > 0:
             self.logger.info("Creating %d orders:" % (len(to_create)))
@@ -98,6 +98,10 @@ class OrdersManager:
         except Exception as err:
             raise err
 
+    def check_position_size(self, ):
+        order_positions_size = sum([order.get('size') for order in self.exchange.get_open_orders()
+                                    if order.get('side') == self.settings.REVERSE_SIDE])
+        print(order_positions_size)
 
     async def run_loop(self):
         while True:

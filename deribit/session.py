@@ -43,11 +43,12 @@ class Session():
         try:
             response = requests.post(url=url, headers=headers, json=data)
             # print(response.text)
+
         except Exception as r:
             self.logger.info(r)
 
         if response.status_code != 200:
             raise Exception(f"Wrong response code: {response.status_code}",
-                            f"error: response.text")
+                            f"error: {response.text}")
 
         return response.json()['result']
