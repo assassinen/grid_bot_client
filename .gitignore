@@ -155,3 +155,4 @@ local_settings.py
 */.pytest_cache/*
 .buildts
 settings/*
+logs/*
