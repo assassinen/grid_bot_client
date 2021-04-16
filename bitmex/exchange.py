@@ -29,9 +29,9 @@ class BitmexExchangeInterface:
         return last_order_price[0] if len(last_order_price) > 0 else self.get_last_trade_price()
 
     def get_order_params_from_responce(self, responce):
-        status_mapp = {'New': 'open'}
+        status_mapp = {'New': 'open', 'Canceled': 'cancelled'}
         data_format = '%Y-%m-%dT%H:%M:%S.%fZ'
-        dt = responce.get('timestamp')
+        dt = responce.get('timestamp', '1970-01-01T00:00:00.000Z')
         timestamp = int(time.mktime(datetime.strptime(dt, data_format).timetuple()) * 1000) + int(dt[-4:-1])
         return {'price': responce.get('price'),
                 'size': responce.get('orderQty'),
