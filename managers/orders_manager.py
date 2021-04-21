@@ -103,22 +103,22 @@ class OrdersManager:
         active_orders = kw.get('active_orders')
         active_orders_size = sum([order.get('size') for order in active_orders
                                   if order.get('side') == self.settings.REVERSE_SIDE])
-        return active_orders_size == kw.get('positions').get('size')
+        return active_orders_size <= kw.get('positions').get('size')
 
     async def run_loop(self):
         while True:
             try:
                 kw = self.get_data_for_calculations(self.orders_state)
 
-                if not self.check_position_size(kw):
-                    await asyncio.sleep(self.settings.LOOP_INTERVAL)
-                    continue
-
                 self.logger.info(f"last_prices: {kw.get('last_prices')}")
                 self.logger.info(f"positions: {kw.get('positions')}")
                 self.logger.info("active_orders: ")
                 for order in kw.get("active_orders"):
                     self.logger.info(f"  {order}")
+
+                # if not self.check_position_size(kw):
+                #     await asyncio.sleep(self.settings.LOOP_INTERVAL)
+                #     continue
 
                 orders_for_update = self.get_orders_for_update(kw)
                 for k, v in orders_for_update.items():
