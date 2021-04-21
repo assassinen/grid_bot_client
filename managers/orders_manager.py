@@ -36,10 +36,10 @@ class OrdersManager:
 
     def get_data_for_calculations(self, orders_state):
         return {
-                'positions': self.exchange.get_positions(),
-                'active_orders': self.exchange.get_orders_state(orders_state),
                 'last_prices': {'trade_price': self.exchange.get_last_trade_price(),
                                 'order_price': self.exchange.get_last_order_price(self.settings.GRID_SIDE)},
+                'active_orders': self.exchange.get_orders_state(orders_state),
+                'positions': self.exchange.get_positions(),
         }
 
     def replace_orders(self, to_create, to_cancel):
