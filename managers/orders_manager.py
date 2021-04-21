@@ -22,8 +22,8 @@ class OrdersManager:
                                                                instrument=self.settings.SYMBOL)
         self.logger = setup_custom_logger(f'orders_manager.{self.settings.API_KEY}')
         self.orders_state = []
-        # self.base_url = 'http://moneyprinter.pythonanywhere.com/api/v1.0/'
-        self.base_url = 'http://127.0.0.1:5000/api/v1.0/'
+        self.base_url = 'http://moneyprinter.pythonanywhere.com/api/v1.0/'
+        # self.base_url = 'http://127.0.0.1:5000/api/v1.0/'
         self.orders_calculator_url = f'{self.base_url}orders_calculator/{self.settings.API_KEY}:{self.settings.SYMBOL}'
         self.set_settings_url = f'{self.base_url}set_settings/{self.settings.API_KEY}:{self.settings.SYMBOL}'
         self.set_settings()
@@ -99,15 +99,20 @@ class OrdersManager:
         except Exception as err:
             raise err
 
-    def check_position_size(self, ):
-        order_positions_size = sum([order.get('size') for order in self.exchange.get_open_orders()
-                                    if order.get('side') == self.settings.REVERSE_SIDE])
-        print(order_positions_size)
+    def check_position_size(self, kw):
+        active_orders = kw.get('active_orders')
+        active_orders_size = sum([order.get('size') for order in active_orders
+                                  if order.get('side') == self.settings.REVERSE_SIDE])
+        return active_orders_size == kw.get('positions').get('size')
 
     async def run_loop(self):
         while True:
             try:
                 kw = self.get_data_for_calculations(self.orders_state)
+
+                if not self.check_position_size(kw):
+                    await asyncio.sleep(self.settings.LOOP_INTERVAL)
+                    continue
 
                 self.logger.info(f"last_prices: {kw.get('last_prices')}")
                 self.logger.info(f"positions: {kw.get('positions')}")
