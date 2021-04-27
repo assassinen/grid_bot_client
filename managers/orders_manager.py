@@ -53,11 +53,12 @@ class OrdersManager:
             self.logger.info("Creating %d orders:" % (len(to_create)))
             for order in to_create:
                 responce = self.exchange.create_order(order)
-                if 'order' in responce:
-                    order = responce['order']
-                    orders_status.append(order['order_id'])
-                    self.logger.info("  %4s %d @ %.2f" % (
-                        order['direction'].lower(), order['amount'], order['price']))
+                orders_status.append(responce.get('order_id'))
+                self.logger.info("  %4s %d @ %.2f" % (
+                    responce.get('side'), responce.get('size'), responce.get('price')))
+                # self.logger.info(f"  {order.get('side')}")
+                    # order.get('side'), order.get('size'), order.get('price')))
+
         return orders_status
 
     def set_settings(self):
