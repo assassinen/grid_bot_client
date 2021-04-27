@@ -69,7 +69,8 @@ class DeribitExchangeInterface:
             'type': 'limit',
         }
         order = self.session.post(method, params)
-        return self.get_order_params_from_responce(order)
+        # print(order)
+        return self.get_order_params_from_responce(order.get('order'))
 
     def cancel_all_orders(self):
         method = 'private/cancel_all_by_instrument'
