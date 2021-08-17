@@ -115,6 +115,7 @@ class OrdersManager:
                                     self.replace_orders(orders_for_update.get('to_create'),
                                                         orders_for_update.get('to_cancel'))
                 # print(self.orders_state)
+                self.get_data_for_calculations(self.orders_state)
             except Exception as err:
                 self.logger.info(f"{err}")
                 await asyncio.sleep(self.settings.LOOP_INTERVAL)
