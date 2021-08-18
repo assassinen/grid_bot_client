@@ -33,7 +33,8 @@ class DeribitExchangeInterface:
                 'size': responce.get('amount'),
                 'side': responce.get('direction'),
                 'order_id': responce.get('order_id'),
-                'status': responce.get('order_state')}
+                'status': responce.get('order_state'),
+                'timestamp': responce.get('last_update_timestamp')}
 
     def get_open_orders(self):
         method = 'private/get_open_orders_by_instrument'

@@ -112,11 +112,13 @@ class OrdersManager:
 
             try:
                 orders_for_update = self.get_orders_for_update(kw)
+                # print(orders_for_update.get('to_get_info'))
                 self.orders_state = orders_for_update.get('to_get_info') + \
                                     self.replace_orders(orders_for_update.get('to_create'),
                                                         orders_for_update.get('to_cancel'))
                 # print(self.orders_state)
                 kw = self.get_data_for_calculations(self.orders_state)
+                # print(kw)
                 self.get_orders_for_update(kw)
             except Exception as err:
                 self.logger.info(f"{err}")
