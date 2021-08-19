@@ -76,3 +76,8 @@ class DeribitExchangeInterface:
         result = self.session.post(method, params)
         return result
 
+    def cancel_order(self, order_id):
+        method = 'private/cancel'
+        params = {'order_id': order_id}
+        result = self.session.post(method, params)
+        return result

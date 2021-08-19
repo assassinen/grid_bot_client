@@ -47,7 +47,8 @@ class OrdersManager:
             for order in to_cancel:
                 self.logger.info(f"  {order}")
                 # logger.info(f"{order['side']}, {order['size']}, {order['price']}")
-            self.exchange.cancel_all_orders()
+                self.exchange.cancel_order(order)
+            # self.exchange.cancel_all_orders()
         if len(to_create) > 0:
             self.logger.info("Creating %d orders:" % (len(to_create)))
             for order in to_create:
