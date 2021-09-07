@@ -1,6 +1,6 @@
 import time
 from datetime import datetime
-from bitmex.session import Session
+from ex_bitmex.session import Session
 
 class BitmexExchangeInterface:
 

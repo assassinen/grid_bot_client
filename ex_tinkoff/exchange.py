@@ -1,12 +1,38 @@
-
 from models.states import OrderSide
-from deribit.session import Session
+from ex_deribit.session import Session
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+import random
+import time
+from selenium.common.exceptions import NoSuchElementException
 
-class DeribitExchangeInterface:
+class TinkoffExchangeInterface:
 
     def __init__(self, key, secret, base_url, api_url, instrument):
+        self.key = key
+        self.secret = secret
         self.instrument = instrument
         self.session = Session(key, secret, base_url, api_url)
+        self.driver = webdriver.Remote(command_executor='http://localhost:4444/wd/hub',
+                                       desired_capabilities={"browserName": "chrome",
+                                                             "enableVNC": True})
+
+    def get_session_id(self):
+        items = ['Акции', 'Фонды', 'Облигации', 'Валюта', 'Избранное']
+        self.driver.get("https://www.tinkoff.ru/invest/catalog")
+        try:
+            self.driver.find_element(By.LINK_TEXT, "Войти").click()
+            self.driver.find_element(By.NAME, "login").click()
+            self.driver.find_element(By.NAME, "login").send_keys(self.key)
+            self.driver.find_element(By.NAME, "password").send_keys(self.secret)
+            self.driver.find_element(By.CSS_SELECTOR, ".ui-button").click()
+            time.sleep(5)
+        except:
+            pass
+        self.driver.find_element(By.LINK_TEXT, items[random.randint(0, 4)]).click()
+        cookies = self.driver.get_cookies()
+        self.session_id = [cookie.get('value') for cookie in cookies if cookie.get('name') == 'psid']
+        return self.session_id[0] if len(self.session_id) > 0 else ''
 
     def get_positions(self):
         method = 'private/get_position'

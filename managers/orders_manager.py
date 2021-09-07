@@ -3,8 +3,9 @@ import asyncio
 import os.path
 import requests
 import jsonpickle
-from bitmex.exchange import BitmexExchangeInterface
-from deribit.exchange_v2 import DeribitExchangeInterface
+from ex_bitmex.exchange import BitmexExchangeInterface
+from ex_deribit.exchange_v2 import DeribitExchangeInterface
+from ex_tinkoff.exchange import TinkoffExchangeInterface
 from models.log import setup_custom_logger
 
 
@@ -14,7 +15,8 @@ class OrdersManager:
         self.settings = settings
         self.exchanges = {
             'bitmex': BitmexExchangeInterface,
-            'deribit': DeribitExchangeInterface
+            'deribit': DeribitExchangeInterface,
+            'tinkoff': TinkoffExchangeInterface
         }
         self.exchange = self.exchanges[self.settings.EXCHANGE](key=self.settings.API_KEY,
                                                                secret=self.settings.API_SECRET,
@@ -112,28 +114,28 @@ class OrdersManager:
 
     async def run_loop(self):
         while True:
-            try:
-                kw = self.get_data_for_calculations(self.orders_state)
+            self.logger.info(f"{self.exchange.get_session_id()}")
+            # try:
+            #     kw = self.get_data_for_calculations(self.orders_state)
+            #
+            #     self.logger.info(f"last_prices: {kw.get('last_prices')}")
+            #     self.logger.info(f"positions: {kw.get('positions')}")
+            #     self.logger.info("active_orders: ")
+            #     for order in kw.get("active_orders"):
+            #         self.logger.info(f"  {order}")
+            #
+            #     orders_for_update = self.get_orders_for_update(kw)
+            #     for k, v in orders_for_update.items():
+            #         self.logger.info(f"{k}: ")
+            #         for order in v:
+            #             self.logger.info(f"  {order}")
+            #
+            #     self.orders_state = orders_for_update.get('to_get_info') + \
+            #                         self.replace_orders(orders_for_update.get('to_create'),
+            #                                             orders_for_update.get('to_cancel'))
+            # except Exception as err:
+            #     self.logger.info(f"{err}")
 
-                self.logger.info(f"last_prices: {kw.get('last_prices')}")
-                self.logger.info(f"positions: {kw.get('positions')}")
-                self.logger.info("active_orders: ")
-                for order in kw.get("active_orders"):
-                    self.logger.info(f"  {order}")
-
-                orders_for_update = self.get_orders_for_update(kw)
-                for k, v in orders_for_update.items():
-                    self.logger.info(f"{k}: ")
-                    for order in v:
-                        self.logger.info(f"  {order}")
-
-                self.orders_state = orders_for_update.get('to_get_info') + \
-                                    self.replace_orders(orders_for_update.get('to_create'),
-                                                        orders_for_update.get('to_cancel'))
-            except Exception as err:
-                self.logger.info(f"{err}")
-                # await asyncio.sleep(self.settings.LOOP_INTERVAL)
-                # continue
             await asyncio.sleep(self.settings.LOOP_INTERVAL)
 
 class SetSettings(Exception):
