@@ -1,3 +1,4 @@
+
 import requests
 import time
 from models.log import setup_custom_logger
@@ -49,6 +50,6 @@ class Session():
 
         if response.status_code != 200:
             raise Exception(f"Wrong response code: {response.status_code}",
-                            f"error: {response.text}")
+                            f"{response.text}")
 
         return response.json()['result']

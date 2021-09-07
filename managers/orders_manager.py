@@ -1,3 +1,4 @@
+
 import asyncio
 import os.path
 import requests
@@ -48,7 +49,9 @@ class OrdersManager:
             self.logger.info("Canceling %d orders:" % (len(to_cancel)))
             for order in to_cancel:
                 self.logger.info(f"  {order}")
-            self.exchange.cancel_all_orders()
+                # logger.info(f"{order['side']}, {order['size']}, {order['price']}")
+                self.exchange.cancel_order(order)
+            # self.exchange.cancel_all_orders()
         if len(to_create) > 0:
             self.logger.info("Creating %d orders:" % (len(to_create)))
             for order in to_create:
@@ -118,10 +121,6 @@ class OrdersManager:
                 for order in kw.get("active_orders"):
                     self.logger.info(f"  {order}")
 
-                # if not self.check_position_size(kw):
-                #     await asyncio.sleep(self.settings.LOOP_INTERVAL)
-                #     continue
-
                 orders_for_update = self.get_orders_for_update(kw)
                 for k, v in orders_for_update.items():
                     self.logger.info(f"{k}: ")
@@ -133,8 +132,8 @@ class OrdersManager:
                                                         orders_for_update.get('to_cancel'))
             except Exception as err:
                 self.logger.info(f"{err}")
-                await asyncio.sleep(self.settings.LOOP_INTERVAL)
-                continue
+                # await asyncio.sleep(self.settings.LOOP_INTERVAL)
+                # continue
             await asyncio.sleep(self.settings.LOOP_INTERVAL)
 
 class SetSettings(Exception):
