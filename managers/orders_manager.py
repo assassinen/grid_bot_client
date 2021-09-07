@@ -36,10 +36,12 @@ class OrdersManager:
             return settings[0]
 
     def get_data_for_calculations(self, orders_state):
-        return {'last_prices': {'trade_price': self.exchange.get_last_trade_price(),
+        return {
+                'last_prices': {'trade_price': self.exchange.get_last_trade_price(),
                                 'order_price': self.exchange.get_last_order_price(self.settings.GRID_SIDE)},
+                'active_orders': self.exchange.get_orders_state(orders_state),
                 'positions': self.exchange.get_positions(),
-                'active_orders': self.exchange.get_orders_state(orders_state)}
+        }
 
     def replace_orders(self, to_create, to_cancel):
         orders_status = []
@@ -54,11 +56,13 @@ class OrdersManager:
             self.logger.info("Creating %d orders:" % (len(to_create)))
             for order in to_create:
                 responce = self.exchange.create_order(order)
-                if 'order' in responce:
-                    order = responce['order']
-                    orders_status.append(order['order_id'])
-                    self.logger.info("  %4s %d @ %.2f" % (
-                        order['direction'].lower(), order['amount'], order['price']))
+                orders_status.append(responce.get('order_id'))
+                # self.logger.info(f'  {responce}')
+                self.logger.info("  %4s %d @ %.2f" % (
+                    responce.get('side'), responce.get('size'), responce.get('price')))
+                # self.logger.info(f"  {order.get('side')}")
+                    # order.get('side'), order.get('size'), order.get('price')))
+
         return orders_status
 
     def set_settings(self):
@@ -100,6 +104,11 @@ class OrdersManager:
         except Exception as err:
             raise err
 
+    def check_position_size(self, kw):
+        active_orders = kw.get('active_orders')
+        active_orders_size = sum([order.get('size') for order in active_orders
+                                  if order.get('side') == self.settings.REVERSE_SIDE])
+        return active_orders_size <= kw.get('positions').get('size')
 
     async def run_loop(self):
         while True:
@@ -113,6 +122,11 @@ class OrdersManager:
                     self.logger.info(f"  {order}")
 
                 orders_for_update = self.get_orders_for_update(kw)
+                for k, v in orders_for_update.items():
+                    self.logger.info(f"{k}: ")
+                    for order in v:
+                        self.logger.info(f"  {order}")
+
                 self.orders_state = orders_for_update.get('to_get_info') + \
                                     self.replace_orders(orders_for_update.get('to_create'),
                                                         orders_for_update.get('to_cancel'))

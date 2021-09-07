@@ -44,6 +44,7 @@ class Session():
         try:
             response = requests.post(url=url, headers=headers, json=data)
             # print(response.text)
+
         except Exception as r:
             self.logger.info(r)
 

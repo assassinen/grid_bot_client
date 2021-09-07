@@ -44,14 +44,16 @@ class Session():
             self.logger.info(r)
 
         if response.status_code != 200:
-            raise Exception("Wrong response code: {0}".format(response.status_code))
+            raise Exception(f"Wrong response code: {response.status_code} "
+                            f"Text: {response.text}")
         return response.json()
 
     def get(self, action, query=''):
         return self.request('GET', action, query)
 
     def post(self, action, postdict):
-        return self.request('POST', action, data=postdict)
+        result = self.request('POST', action, data=postdict)
+        return result
 
     def delete(self, action, postdict):
         return self.request('DELETE', action, data=postdict)

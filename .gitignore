@@ -24,6 +24,7 @@ out/
 .idea
 .idea_modules/
 
+
 # JIRA plugin
 atlassian-ide-plugin.xml
 
@@ -155,3 +156,5 @@ static/*
 local_settings.py
 */.pytest_cache/*
 .buildts
+settings/*
+logs/*

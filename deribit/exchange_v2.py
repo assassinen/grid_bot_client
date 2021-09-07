@@ -68,8 +68,9 @@ class DeribitExchangeInterface:
             'time_in_force': 'good_til_cancelled',
             'type': 'limit',
         }
-        result = self.session.post(method, params)
-        return result
+        order = self.session.post(method, params)
+        # print(order)
+        return self.get_order_params_from_responce(order.get('order'))
 
     def cancel_all_orders(self):
         method = 'private/cancel_all_by_instrument'
