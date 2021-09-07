@@ -13,7 +13,7 @@ class TinkoffExchangeInterface:
         self.secret = secret
         self.instrument = instrument
         self.session = Session(key, secret, base_url, api_url)
-        self.driver = webdriver.Remote(command_executor='http://localhost:4444/wd/hub',
+        self.driver = webdriver.Remote(command_executor='http://0.0.0.0:4444/wd/hub',
                                        desired_capabilities={"browserName": "chrome",
                                                              "enableVNC": True})
 
