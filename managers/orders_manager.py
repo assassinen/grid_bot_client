@@ -5,7 +5,8 @@ import requests
 import jsonpickle
 from bitmex.exchange import BitmexExchangeInterface
 from deribit.exchange_v2 import DeribitExchangeInterface
-from binance.exchange import BinanceExchangeInterface
+from binance.exchange import (BinanceExchangeVanillaOptionsInterface,
+                              BinanceExchangeCoinFuturesInterface)
 from models.log import setup_custom_logger
 
 
@@ -16,7 +17,8 @@ class OrdersManager:
         self.exchanges = {
             'bitmex': BitmexExchangeInterface,
             'deribit': DeribitExchangeInterface,
-            'binance': BinanceExchangeInterface
+            'binance_coin_futures': BinanceExchangeCoinFuturesInterface,
+            'binance_vanilla_options': BinanceExchangeVanillaOptionsInterface,
         }
         self.exchange = self.exchanges[self.settings.EXCHANGE](key=self.settings.API_KEY,
                                                                secret=self.settings.API_SECRET,
@@ -51,19 +53,14 @@ class OrdersManager:
             self.logger.info("Canceling %d orders:" % (len(to_cancel)))
             for order in to_cancel:
                 self.logger.info(f"  {order}")
-                # logger.info(f"{order['side']}, {order['size']}, {order['price']}")
                 self.exchange.cancel_order(order)
-            # self.exchange.cancel_all_orders()
         if len(to_create) > 0:
             self.logger.info("Creating %d orders:" % (len(to_create)))
             for order in to_create:
                 responce = self.exchange.create_order(order)
                 orders_status.append(responce.get('order_id'))
-                # self.logger.info(f'  {responce}')
                 self.logger.info("  %4s %d @ %.2f" % (
                     responce.get('side'), responce.get('size'), responce.get('price')))
-                # self.logger.info(f"  {order.get('side')}")
-                    # order.get('side'), order.get('size'), order.get('price')))
 
         return orders_status
 
@@ -116,28 +113,24 @@ class OrdersManager:
         while True:
             try:
                 kw = self.get_data_for_calculations(self.orders_state)
-                print(kw)
 
-            #
-            #     self.logger.info(f"last_prices: {kw.get('last_prices')}")
-            #     self.logger.info(f"positions: {kw.get('positions')}")
-            #     self.logger.info("active_orders: ")
-            #     for order in kw.get("active_orders"):
-            #         self.logger.info(f"  {order}")
-            #
-            #     orders_for_update = self.get_orders_for_update(kw)
-            #     for k, v in orders_for_update.items():
-            #         self.logger.info(f"{k}: ")
-            #         for order in v:
-            #             self.logger.info(f"  {order}")
-            #
-            #     self.orders_state = orders_for_update.get('to_get_info') + \
-            #                         self.replace_orders(orders_for_update.get('to_create'),
-            #                                             orders_for_update.get('to_cancel'))
+                self.logger.info(f"last_prices: {kw.get('last_prices')}")
+                self.logger.info(f"positions: {kw.get('positions')}")
+                self.logger.info("active_orders: ")
+                for order in kw.get("active_orders"):
+                    self.logger.info(f"  {order}")
+
+                orders_for_update = self.get_orders_for_update(kw)
+                for k, v in orders_for_update.items():
+                    self.logger.info(f"{k}: ")
+                    for order in v:
+                        self.logger.info(f"  {order}")
+
+                self.orders_state = orders_for_update.get('to_get_info') + \
+                                    self.replace_orders(orders_for_update.get('to_create'),
+                                                        orders_for_update.get('to_cancel'))
             except Exception as err:
                 self.logger.info(f"{err}")
-                # await asyncio.sleep(self.settings.LOOP_INTERVAL)
-                # continue
             await asyncio.sleep(self.settings.LOOP_INTERVAL)
 
 class SetSettings(Exception):

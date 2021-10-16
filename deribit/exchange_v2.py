@@ -30,6 +30,7 @@ class DeribitExchangeInterface:
         return last_order_price[0] if len(last_order_price) > 0 else self.get_last_trade_price()
 
     def get_order_params_from_responce(self, responce):
+        print(responce)
         return {'price': responce.get('price'),
                 'size': responce.get('amount'),
                 'side': responce.get('direction'),
@@ -69,7 +70,6 @@ class DeribitExchangeInterface:
             'type': 'limit',
         }
         order = self.session.post(method, params)
-        # print(order)
         return self.get_order_params_from_responce(order.get('order'))
 
     def cancel_all_orders(self):

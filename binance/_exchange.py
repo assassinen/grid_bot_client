@@ -1,48 +1,20 @@
 import time
-import json
 import hmac
 import hashlib
 import requests
 from operator import itemgetter
 from datetime import datetime
 from bitmex.session import Session
-# from .exceptions import BinanceAPIException, BinanceRequestException, NotImplementedException
+from .exceptions import BinanceAPIException, BinanceRequestException, NotImplementedException
 
-
-class BinanceAPIException(Exception):
-
-    def __init__(self, response, status_code, text):
-        self.code = 0
-        try:
-            json_res = json.loads(text)
-        except ValueError:
-            self.message = 'Invalid JSON error message from Binance: {}'.format(response.text)
-        else:
-            self.code = json_res['code']
-            self.message = json_res['msg']
-        self.status_code = status_code
-        self.response = response
-        self.request = getattr(response, 'request', None)
-
-    def __str__(self):  # pragma: no cover
-        return 'APIError(code=%s): %s' % (self.code, self.message)
-
-
-class BinanceRequestException(Exception):
-    def __init__(self, message):
-        self.message = message
-
-    def __str__(self):
-        return 'BinanceRequestException: %s' % self.message
-
-
-class BinanceExchangeBaseInterface:
+class BinanceExchangeInterface:
 
     def __init__(self, key, secret, base_url, api_url, instrument):
         self.instrument = instrument
         self.API_KEY = key
         self.API_SECRET = secret
         self.uri = f'{base_url}/{api_url}'
+        # self.session = Session(key, secret, base_url, api_url)
         self.session = self._init_session()
 
     def _get_headers(self):
@@ -64,6 +36,8 @@ class BinanceExchangeBaseInterface:
     def _request(self, method, uri, signed, force_params=False, **kwargs):
         kwargs = self._get_request_kwargs(method, signed, force_params, **kwargs)
         self.response = getattr(self.session, method)(uri, **kwargs)
+        print(self.response.request.url)
+        print(self.response.request.headers)
         return self._handle_response(self.response)
 
     @staticmethod
@@ -144,21 +118,6 @@ class BinanceExchangeBaseInterface:
         m = hmac.new(self.API_SECRET.encode('utf-8'), query_string.encode('utf-8'), hashlib.sha256)
         return m.hexdigest()
 
-    def _get_order_params_from_responce(self, responce):
-        status_mapp = {'NEW': 'open', 'Cancelled': 'cancelled'}
-        data_format = '%Y-%m-%dT%H:%M:%S.%fZ'
-        dt = responce.get('timestamp', '1970-01-01T00:00:00.000Z')
-        timestamp = int(time.mktime(datetime.strptime(dt, data_format).timetuple()) * 1000) + int(dt[-4:-1])
-        return {'price': responce.get('price'),
-                'size': responce.get('quantity'),
-                'side': responce.get('side', 'No data').lower(),
-                'order_id': responce.get('id'),
-                'status': status_mapp.get(responce.get('status'), responce.get('status').lower()),
-                'timestamp': timestamp,
-                }
-
-
-class BinanceExchangeVanillaOptionsInterface(BinanceExchangeBaseInterface):
 
     def get_positions(self):
         path = 'position'
@@ -184,30 +143,50 @@ class BinanceExchangeVanillaOptionsInterface(BinanceExchangeBaseInterface):
         price = [i for i in result.get('data') if i.get('symbol') == self.instrument]
         return price[0].get('price') if len(price) > 0 else self.get_last_trade_price()
 
+    def get_order_params_from_responce(self, responce):
+        status_mapp = {'NEW': 'open', 'Canceled': 'cancelled'}
+        data_format = '%Y-%m-%dT%H:%M:%S.%fZ'
+        dt = responce.get('timestamp', '1970-01-01T00:00:00.000Z')
+        timestamp = int(time.mktime(datetime.strptime(dt, data_format).timetuple()) * 1000) + int(dt[-4:-1])
+        return {'price': responce.get('price'),
+                'size': responce.get('quantity'),
+                'side': responce.get('side', 'No data').lower(),
+                'order_id': responce.get('id'),
+                'status': status_mapp.get(responce.get('status'), responce.get('status').lower()),
+                'timestamp': timestamp,
+                }
+
     def get_order_state(self, order_id):
-        # todo реализовать
+        query = f'?filter=%7B%22orderID%22%3A%22{order_id}%22%7D&count=1&reverse=false'
         try:
-            1 / 0
-            order = {}
+            order = self.session.get('order', query)[0]
         except Exception as r:
             order = {'orderID': order_id, 'ordStatus': 'cancelled'}
-        return self._get_order_params_from_responce(order)
+        return self.get_order_params_from_responce(order)
+
+    def get_orders_state(self, orders_state):
+        open_orders = self.get_open_orders()
+        # open_order_ids = [open_order.get('order_id') for open_order in open_orders]
+        # order_state_ids = [order_id for order_id in orders_state if order_id not in open_order_ids]
+        # return open_orders + [self.get_order_state(order_id) for order_id in order_state_ids]
+        return 123
 
     def get_open_orders(self):
         path = 'openOrders'
         params = {'symbol': self.instrument}
         result = self._request('get', f'{self.uri}/{path}', signed=True, force_params=True, data=params)
-        open_orders = [i for i in result.get('data') if i.get('symbol') == self.instrument]
-        return [self._get_order_params_from_responce(order) for order in open_orders]
+        open_orders = [i for i in result if i.get('symbol') == self.instrument]
+        return [self.get_order_params_from_responce(order) for order in open_orders]
 
-    def get_orders_state(self, orders_state):
-        open_orders = self.get_open_orders()
-        open_order_ids = [open_order.get('order_id') for open_order in open_orders]
-        order_state_ids = [order_id for order_id in orders_state if order_id not in open_order_ids]
-        return open_orders + [self.get_order_state(order_id) for order_id in order_state_ids]
+        # return price[0].get('price') if len(price) > 0 else self.gext_last_trade_price()
+
+        # query = '?filter=%7B%22ordStatus%22%3A%20%22New%22%7D&reverse=true' \
+        #         '&columns=price%2C%20orderQty%2C%20side%2C%20ordStatus%2C%20timestamp' \
+        #         '&symbol={}'.format(self.instrument)
+        # open_orders = self.session.get('order', query)
+        # return [self.get_order_params_from_responce(order) for order in open_orders]
 
     def create_order(self, order=''):
-        # todo реализовать
         postdict = {
             'symbol': self.instrument,
             'side': order['side'].title(),
@@ -216,91 +195,8 @@ class BinanceExchangeVanillaOptionsInterface(BinanceExchangeBaseInterface):
             'ordType': 'Limit',
             'execInst': 'ParticipateDoNotInitiate'}
         order = self.session.post('order', postdict)
-        return self._get_order_params_from_responce(order)
+        return self.get_order_params_from_responce(order)
 
     def cancel_all_orders(self):
-        # todo реализовать
         postdict = {'symbol': self.instrument}
         return self.session.delete('order/all', postdict)
-
-
-class BinanceExchangeCoinFuturesInterface(BinanceExchangeBaseInterface):
-
-    def get_positions(self):
-        path = 'positionRisk'
-        result = self._request('get', f'{self.uri}/{path}', signed=True, force_params=True, data={})
-        position = [i for i in result if i.get('symbol') == self.instrument]
-        position = position[0] if len(position) > 0 else {}
-        return {'average_price': float(position.get('entryPrice')),
-                'size': float(position.get('positionAmt', 0))}
-
-    def get_last_trade_price(self):
-        path = 'ticker/24hr'
-        params = {"symbol": self.instrument}
-        result = self._request('get', f'{self.uri}/{path}', signed=True, force_params=True, data=params)
-        return float(result[0].get('lastPrice')) if len(result) > 0 else None
-
-    def get_last_order_price(self, side):
-        path = 'userTrades'
-        params = {'symbol': self.instrument}
-        result = self._request('get', f'{self.uri}/{path}', signed=True, force_params=True, data=params)
-        price = [i for i in result if i.get('side') == side.upper()]
-        return float(price[0].get('price')) if len(price) > 0 else self.get_last_trade_price()
-
-    def get_order_state(self, order_id):
-        # todo реализовать
-        try:
-            path = 'order'
-            params = {'symbol': self.instrument,
-                      'orderId': order_id}
-            order = self._request('get', f'{self.uri}/{path}', signed=True, force_params=True, data=params)
-        except Exception as r:
-            order = {'orderID': order_id, 'ordStatus': 'cancelled'}
-        return self.get_order_params_from_responce(order)
-
-    def get_order_params_from_responce(self, responce):
-        status_mapp = {'NEW': 'open', 'CANCELED': 'cancelled'}
-        return {'price': float(responce.get('price')),
-                'size': float(responce.get('origQty')),
-                'side': responce.get('side', 'No data').lower(),
-                'order_id': responce.get('orderId'),
-                'status': status_mapp.get(responce.get('status'), responce.get('status').lower()),
-                'timestamp': responce.get('updateTime'),
-                }
-
-    def get_open_orders(self):
-        path = 'openOrders'
-        params = {'symbol': self.instrument}
-        result = self._request('get', f'{self.uri}/{path}', signed=True, force_params=True, data=params)
-        return [self.get_order_params_from_responce(order) for order in result]
-
-    def get_orders_state(self, orders_state):
-        open_orders = self.get_open_orders()
-        open_order_ids = [open_order.get('order_id') for open_order in open_orders]
-        order_state_ids = [order_id for order_id in orders_state if order_id not in open_order_ids]
-        return open_orders + [self.get_order_state(order_id) for order_id in order_state_ids]
-
-    def create_order(self, order=''):
-        # todo реализовать
-        path = 'order'
-        params = {
-            'symbol': self.instrument,
-            'side': order['side'].upper(),
-            'quantity': order['size'],
-            'price': order['price'],
-            'type': 'LIMIT',
-            'timeInForce': 'GTC',
-        }
-        order = self._request('post', f'{self.uri}/{path}', signed=True, force_params=True, data=params)
-        return self.get_order_params_from_responce(order)
-
-    def cancel_all_orders(self):
-        path = 'allOpenOrders'
-        params = {'symbol': self.instrument}
-        return self._request('delete', f'{self.uri}/{path}', signed=True, force_params=True, data=params)
-
-    def cancel_order(self, order_id):
-        path = 'allOpenOrders'
-        params = {'symbol': self.instrument,
-                  'orderId': order_id}
-        return self._request('delete', f'{self.uri}/{path}', signed=True, force_params=True, data=params)
