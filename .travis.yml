@@ -12,3 +12,4 @@ jobs:
     - stage: test
       script: docker run --rm $DOCKER_USERNAME/travis-ci-build-stages-demo cat hello.txt
     - script: docker run --rm $DOCKER_USERNAME/travis-ci-build-stages-demo cat hello.txt
+      
