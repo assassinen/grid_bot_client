@@ -1,8 +1,12 @@
 variables:
-  TAG: ${TRAVIS_BRANCH}
+  TAG: $TRAVIS_BRANCH
 
 script:
-  - if [ "$TRAVIS_BRANCH" != "master" ]; then export TAG="latest"; fi
+  - export TAG=$TRAVIS_BRANCH
+  - echo $TAG
+  - echo $TRAVIS_BRANCH
+  - if [ $TRAVIS_BRANCH != "master" ]; then export TAG="latest"; fi
+  - echo $TAG
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker build -t assassinen/grid_bot_client:$TAG .
   - docker push assassinen/grid_bot_client:$TAG
