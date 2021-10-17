@@ -4,4 +4,7 @@ services:
   - docker
 
 script:
-  - docker build -t assassinen/grid_bot_client:latest .
+  - echo "hello"
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+#  docker push USER/REPO
+#  - docker build -t assassinen/grid_bot_client:latest .
