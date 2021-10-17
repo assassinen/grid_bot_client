@@ -1,4 +1,4 @@
-
+import time
 from models.states import OrderSide
 from ex_deribit.session import Session
 
@@ -15,7 +15,15 @@ class DeribitExchangeInterface:
         return {'average_price': result.get('average_price'),
                 'size': result.get('size', 0)}
 
+    def get_get_mark_price(self):
+        method = 'public/get_book_summary_by_instrument'
+        params = {'instrument_name': self.instrument}
+        result = self.session.post(method, params)
+        return result[0]['mark_price'] if result else None
+
     def get_last_trade_price(self):
+        if self.instrument.endswith("C") or self.instrument.endswith("P"):
+            return self.get_get_mark_price()
         method = 'public/get_last_trades_by_instrument'
         params = {'instrument_name': self.instrument, 'count': 1}
         result = self.session.post(method, params)
@@ -69,7 +77,6 @@ class DeribitExchangeInterface:
             'type': 'limit',
         }
         order = self.session.post(method, params)
-        # print(order)
         return self.get_order_params_from_responce(order.get('order'))
 
     def cancel_all_orders(self):

@@ -1,0 +1,8 @@
+language: python
+
+script:
+  - export TAG=$TRAVIS_BRANCH
+  - if [ $TRAVIS_BRANCH != "master" ]; then export TAG="latest"; fi
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - docker build -t assassinen/grid_bot_client:$TAG .
+  - docker push assassinen/grid_bot_client:$TAG
