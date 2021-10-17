@@ -2,6 +2,7 @@ variables:
   TAG: $TRAVIS_BRANCH
 
 script:
+  - export TAG=$TRAVIS_BRANCH
   - echo $TAG
   - echo $TRAVIS_BRANCH
   - if [ $TRAVIS_BRANCH != "master" ]; then export TAG="latest"; fi
