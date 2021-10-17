@@ -5,6 +5,7 @@ services:
 
 script:
   - echo $TRAVIS_REPO_SLUG
+  - echo $TRAVIS_TAG
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker build -t assassinen/grid_bot_client:latest .
   - docker push assassinen/grid_bot_client:latest
