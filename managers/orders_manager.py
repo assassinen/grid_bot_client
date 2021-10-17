@@ -59,7 +59,7 @@ class OrdersManager:
             for order in to_create:
                 responce = self.exchange.create_order(order)
                 orders_status.append(responce.get('order_id'))
-                self.logger.info("  %4s %d @ %.2f" % (
+                self.logger.info("  %4s %.2f @ %.4f" % (
                     responce.get('side'), responce.get('size'), responce.get('price')))
 
         return orders_status
