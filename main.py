@@ -41,7 +41,6 @@ client = DeribitExchangeInterface(key=api_key,
                                    # instrument="BTCUSD_PERP",
                                    instrument="BTC-29OCT21-70000-C",
                                              )
-
 print(client.get_positions())
 # print(client.get_last_order_price('buy'))
 print(client.get_last_trade_price())
