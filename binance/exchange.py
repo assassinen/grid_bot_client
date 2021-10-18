@@ -248,7 +248,6 @@ class BinanceExchangeCoinFuturesInterface(BinanceExchangeBaseInterface):
         return float(price[0].get('price')) if len(price) > 0 else self.get_last_trade_price()
 
     def get_order_state(self, order_id):
-        # todo реализовать
         try:
             path = 'order'
             params = {'symbol': self.instrument,
@@ -263,7 +262,7 @@ class BinanceExchangeCoinFuturesInterface(BinanceExchangeBaseInterface):
         return {'price': float(responce.get('price')),
                 'size': float(responce.get('origQty')),
                 'side': responce.get('side', 'No data').lower(),
-                'order_id': responce.get('orderId'),
+                'order_id': str(responce.get('orderId')),
                 'status': status_mapp.get(responce.get('status'), responce.get('status').lower()),
                 'timestamp': responce.get('updateTime'),
                 }
