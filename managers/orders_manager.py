@@ -126,9 +126,9 @@ class OrdersManager:
                     for order in v:
                         self.logger.info(f"  {order}")
 
-                # self.orders_state = orders_for_update.get('to_get_info') + \
-                #                     self.replace_orders(orders_for_update.get('to_create'),
-                #                                         orders_for_update.get('to_cancel'))
+                self.orders_state = orders_for_update.get('to_get_info') + \
+                                    self.replace_orders(orders_for_update.get('to_create'),
+                                                        orders_for_update.get('to_cancel'))
             except Exception as err:
                 self.logger.info(f"{err}")
             await asyncio.sleep(self.settings.LOOP_INTERVAL)
