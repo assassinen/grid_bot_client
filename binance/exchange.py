@@ -245,7 +245,7 @@ class BinanceExchangeCoinFuturesInterface(BinanceExchangeBaseInterface):
         params = {'symbol': self.instrument}
         result = self._request('get', f'{self.uri}/{path}', signed=True, force_params=True, data=params)
         price = [i for i in result if i.get('side') == side.upper()]
-        return float(price[0].get('price')) if len(price) > 0 else self.get_last_trade_price()
+        return float(price[-1].get('price')) if len(price) > 0 else self.get_last_trade_price()
 
     def get_order_state(self, order_id):
         try:
