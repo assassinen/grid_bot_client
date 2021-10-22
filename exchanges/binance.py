@@ -5,8 +5,6 @@ import hashlib
 import requests
 from operator import itemgetter
 from datetime import datetime
-from bitmex.session import Session
-# from .exceptions import BinanceAPIException, BinanceRequestException, NotImplementedException
 
 
 class BinanceAPIException(Exception):
@@ -144,19 +142,6 @@ class BinanceExchangeBaseInterface:
         m = hmac.new(self.API_SECRET.encode('utf-8'), query_string.encode('utf-8'), hashlib.sha256)
         return m.hexdigest()
 
-    def _get_order_params_from_responce(self, responce):
-        status_mapp = {'NEW': 'open', 'Cancelled': 'cancelled'}
-        data_format = '%Y-%m-%dT%H:%M:%S.%fZ'
-        dt = responce.get('timestamp', '1970-01-01T00:00:00.000Z')
-        timestamp = int(time.mktime(datetime.strptime(dt, data_format).timetuple()) * 1000) + int(dt[-4:-1])
-        return {'price': responce.get('price'),
-                'size': responce.get('quantity'),
-                'side': responce.get('side', 'No data').lower(),
-                'order_id': responce.get('id'),
-                'status': status_mapp.get(responce.get('status'), responce.get('status').lower()),
-                'timestamp': timestamp,
-                }
-
 
 class BinanceExchangeVanillaOptionsInterface(BinanceExchangeBaseInterface):
 
@@ -280,7 +265,6 @@ class BinanceExchangeCoinFuturesInterface(BinanceExchangeBaseInterface):
         return open_orders + [self.get_order_state(order_id) for order_id in order_state_ids]
 
     def create_order(self, order=''):
-        # todo реализовать
         path = 'order'
         params = {
             'symbol': self.instrument,

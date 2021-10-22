@@ -1,12 +1,11 @@
 
 import asyncio
-import os.path
 import requests
 import jsonpickle
-from bitmex.exchange import BitmexExchangeInterface
-from deribit.exchange_v2 import DeribitExchangeInterface
-from binance.exchange import (BinanceExchangeVanillaOptionsInterface,
-                              BinanceExchangeCoinFuturesInterface)
+from ex_bitmex.exchange import BitmexExchangeInterface
+from exchanges.deribit import DeribitExchangeInterface
+from exchanges.binance import (BinanceExchangeVanillaOptionsInterface,
+                               BinanceExchangeCoinFuturesInterface)
 from models.log import setup_custom_logger
 
 
@@ -126,9 +125,9 @@ class OrdersManager:
                     for order in v:
                         self.logger.info(f"  {order}")
 
-                self.orders_state = orders_for_update.get('to_get_info') + \
-                                    self.replace_orders(orders_for_update.get('to_create'),
-                                                        orders_for_update.get('to_cancel'))
+                # self.orders_state = orders_for_update.get('to_get_info') + \
+                #                     self.replace_orders(orders_for_update.get('to_create'),
+                #                                         orders_for_update.get('to_cancel'))
             except Exception as err:
                 self.logger.info(f"{err}")
             await asyncio.sleep(self.settings.LOOP_INTERVAL)
