@@ -41,7 +41,7 @@ def post(endpoint, data={}, params=""):
 
 endpoint = 'auth/r/wallets'
 endpoint = f'auth/r/orders'
-# params = {'limit': 1}
+params = {'limit': 77337856078}
 # r = post(endpoint, params)
 r = post(endpoint)
 print(r.request.headers)
@@ -58,13 +58,13 @@ print(r.text)
 # }
 
 # endpoint = 'auth/w/position/increase'
-# body = {'symbol': 'tBTCUSD'}
-#
-endpoint = 'auth/w/order/cancel'
-body = {'id': 77333774128}
-r = post(endpoint, body)
-print(r.request.headers)
-print(r.text)
+# # body = {'symbol': 'tBTCUSD'}
+# #
+# endpoint = 'auth/w/order/cancel'
+# body = {'id': 77333774128}
+# r = post(endpoint, body)
+# print(r.request.headers)
+# print(r.text)
 
 
     # async with aiohttp.ClientSession() as session:

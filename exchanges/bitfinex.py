@@ -100,6 +100,7 @@ class BitfinexExchangeInterface:
         open_order_ids = [open_order.get('order_id') for open_order in open_orders]
         order_state_ids = [order_id for order_id in orders_state if order_id not in open_order_ids]
         params = {'id': order_state_ids}
+        print(self._post(method, params))
         if len(order_state_ids) > 0:
             existing_orders = [self.get_order_params_from_responce(order) for order in self._post(method, params)]
             existing_orders_ids = [order.get('order_id') for order in existing_orders]
@@ -128,8 +129,8 @@ class BitfinexExchangeInterface:
         return status
 
     def get_order_params_from_responce(self, responce):
-        side = 'buy' if responce[6] > 0 else 'sell'
-        ratio = 1 if responce[6] > 0 else -1
+        side = 'buy' if responce[7] > 0 else 'sell'
+        ratio = 1 if responce[7] > 0 else -1
         return {'price': responce[16],
                 'size': responce[7] * ratio,
                 'side': side,
