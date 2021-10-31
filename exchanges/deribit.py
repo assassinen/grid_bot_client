@@ -57,6 +57,7 @@ class DeribitExchangeInterface:
                 'size': result.get('size', 0)}
 
     def get_get_mark_price(self):
+        # для опционов
         method = 'public/get_book_summary_by_instrument'
         params = {'instrument_name': self.instrument}
         result = self._post(method, params)

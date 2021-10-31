@@ -6,6 +6,7 @@ from ex_bitmex.exchange import BitmexExchangeInterface
 from exchanges.deribit import DeribitExchangeInterface
 from exchanges.binance import (BinanceExchangeVanillaOptionsInterface,
                                BinanceExchangeCoinFuturesInterface)
+from exchanges.bitfinex import BitfinexExchangeInterface
 from models.log import setup_custom_logger
 
 
@@ -18,6 +19,7 @@ class OrdersManager:
             'deribit': DeribitExchangeInterface,
             'binance_coin_futures': BinanceExchangeCoinFuturesInterface,
             'binance_vanilla_options': BinanceExchangeVanillaOptionsInterface,
+            'bitfinex': BitfinexExchangeInterface,
         }
         self.exchange = self.exchanges[self.settings.EXCHANGE](key=self.settings.API_KEY,
                                                                secret=self.settings.API_SECRET,
@@ -58,7 +60,7 @@ class OrdersManager:
             for order in to_create:
                 responce = self.exchange.create_order(order)
                 orders_status.append(responce.get('order_id'))
-                self.logger.info("  %4s %.2f @ %.4f" % (
+                self.logger.info("  %4s %.5f @ %.4f" % (
                     responce.get('side'), responce.get('size'), responce.get('price')))
 
         return orders_status
@@ -125,9 +127,9 @@ class OrdersManager:
                     for order in v:
                         self.logger.info(f"  {order}")
 
-                # self.orders_state = orders_for_update.get('to_get_info') + \
-                #                     self.replace_orders(orders_for_update.get('to_create'),
-                #                                         orders_for_update.get('to_cancel'))
+                self.orders_state = orders_for_update.get('to_get_info') + \
+                                    self.replace_orders(orders_for_update.get('to_create'),
+                                                        orders_for_update.get('to_cancel'))
             except Exception as err:
                 self.logger.info(f"{err}")
             await asyncio.sleep(self.settings.LOOP_INTERVAL)

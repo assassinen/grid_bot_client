@@ -30,33 +30,38 @@ def post(endpoint, data={}, params=""):
     Send a pre-signed POST request to the bitfinex api
     @return response
     """
-    host = 'https://api-pub.bitfinex.com/v2'
+    host = 'https://api.bitfinex.com/v2'
     url = '{}/{}'.format(host, endpoint)
     sData = json.dumps(data)
-    headers = generate_auth_headers(API_KEY, API_SECRET, endpoint, sData)
-    headers["content-type"] = "application/json"
+    headers = {"content-type": "application/json"}
+    headers.update(generate_auth_headers(API_KEY, API_SECRET, endpoint, sData))
+    print(headers)
     return requests.post(url + params, headers=headers, data=sData)
 
 
 endpoint = 'auth/r/wallets'
+endpoint = f'auth/r/orders'
+# params = {'limit': 1}
+# r = post(endpoint, params)
 r = post(endpoint)
 print(r.request.headers)
+print(r.request.url)
 print(r.text)
-
-endpoint = 'auth/w/order/submit'
-body = {'type': 'EXCHANGE LIMIT',
-        'symbol': 'tBTCUSD',
-        'price': '60000',
-        'amount': '0.0001',
-        # 'flags': 0,
-        # 'meta': {'aff_code': "AFF_CODE_HERE"}
-}
+#
+# endpoint = 'auth/w/order/submit'
+# body = {'type': 'EXCHANGE LIMIT',
+#         'symbol': 'tBTCUSD',
+#         'price': '55263',
+#         'amount': '0.0001',
+#         # 'flags': 0,
+#         # 'meta': {'aff_code': "AFF_CODE_HERE"}
+# }
 
 # endpoint = 'auth/w/position/increase'
 # body = {'symbol': 'tBTCUSD'}
 #
-# endpoint = 'auth/r/positions/snap'
-# body = {}
+endpoint = 'auth/w/order/cancel'
+body = {'id': 77333774128}
 r = post(endpoint, body)
 print(r.request.headers)
 print(r.text)
