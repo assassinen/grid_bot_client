@@ -26,7 +26,7 @@ class OrdersManager:
                                                                base_url=self.settings.BASE_URL,
                                                                api_url=self.settings.API_URL,
                                                                instrument=self.settings.SYMBOL)
-        self.logger = setup_custom_logger(f'orders_manager.{self.settings.API_KEY}')
+        self.logger = setup_custom_logger(f'orders_manager.{self.settings.API_KEY[:8]}')
         self.orders_state = []
         self.base_url = 'http://moneyprinter.pythonanywhere.com/api/v1.0/'
         # self.base_url = 'http://127.0.0.1:5000/api/v1.0/'
