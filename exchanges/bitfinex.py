@@ -101,13 +101,14 @@ class BitfinexExchangeInterface:
         params = {'id': order_state_ids + open_orders_ids}
         existing_orders = [self.get_order_params_from_responce(order)
                            for order in self._post(method, params)] if len(params.get('id')) > 0 else []
+        existing_orders_ids = [order.get('order_id') for order in existing_orders]
         not_found_orders = [{'price': None,
                              'size': None,
                              'side': None,
                              'order_id': order_id,
                              'status': 'cancelled',
                              'timestamp': None} for order_id in order_state_ids
-                            if order_id not in [order.get('order_id') for order in existing_orders + open_orders_ids]]
+                            if order_id not in existing_orders_ids + open_orders_ids]
         return open_orders + existing_orders + not_found_orders
 
     def replace_order_status(self, raw_status):
