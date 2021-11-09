@@ -283,7 +283,7 @@ class BinanceExchangeCoinFuturesInterface(BinanceExchangeBaseInterface):
         return self._request('delete', f'{self.uri}/{path}', signed=True, force_params=True, data=params)
 
     def cancel_order(self, order_id):
-        path = 'allOpenOrders'
+        path = 'order'
         params = {'symbol': self.instrument,
                   'orderId': order_id}
         return self._request('delete', f'{self.uri}/{path}', signed=True, force_params=True, data=params)
