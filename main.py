@@ -39,14 +39,14 @@ def post(endpoint, data={}, params=""):
     return requests.post(url + params, headers=headers, data=sData)
 
 
-endpoint = 'auth/r/wallets'
-endpoint = f'auth/r/orders'
-params = {'limit': 77337856078}
-# r = post(endpoint, params)
-r = post(endpoint)
-print(r.request.headers)
-print(r.request.url)
-print(r.text)
+# endpoint = 'auth/r/wallets'
+# endpoint = f'auth/r/orders'
+# params = {'limit': 77337856078}
+# # r = post(endpoint, params)
+# r = post(endpoint)
+# print(r.request.headers)
+# print(r.request.url)
+# print(r.text)
 #
 # endpoint = 'auth/w/order/submit'
 # body = {'type': 'EXCHANGE LIMIT',
@@ -60,11 +60,33 @@ print(r.text)
 # endpoint = 'auth/w/position/increase'
 # # body = {'symbol': 'tBTCUSD'}
 # #
-# endpoint = 'auth/w/order/cancel'
-# body = {'id': 77333774128}
-# r = post(endpoint, body)
+endpoint = f'auth/r/orders/tBTCUSD/hist'
+body = {'id': [78161127709,
+78160898992,
+78160738547,
+78160735843,
+78160455519,
+78160318854,
+78159751849,
+78156290646,
+78155904086,
+78151321434,
+78151144361,
+78150939048,
+78149651309,
+78149422266,
+78148562096,
+78148132503,
+78145646616,
+78145120341,
+78144161502,
+78143669906,
+78139207893,
+78139094713]}
+r = post(endpoint, body)
 # print(r.request.headers)
-# print(r.text)
+for i in r.json():
+    print(i[5])
 
 
     # async with aiohttp.ClientSession() as session:
