@@ -4,8 +4,9 @@ import time
 import json
 import requests
 
-API_KEY = 'At880SOrP7kmCq220rtDqTIPHEdQf6BV901UJ9exHiT'
-API_SECRET = '662HSheU6XnnafYpQk9Je5AcPYz4SfdO2VwjPVxbRDY'
+
+API_KEY = ''
+API_SECRET = ''
 
 def _gen_nonce():
   return int(round(time.time() * 1000000))

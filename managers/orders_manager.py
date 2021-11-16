@@ -6,6 +6,7 @@ from ex_bitmex.exchange import BitmexExchangeInterface
 from exchanges.deribit import DeribitExchangeInterface
 from exchanges.binance import (BinanceExchangeVanillaOptionsInterface,
                                BinanceExchangeCoinFuturesInterface)
+from exchanges.tinkoff import TinkoffExchangeInterface
 from exchanges.bitfinex import BitfinexExchangeInterface
 from models.log import setup_custom_logger
 
@@ -20,6 +21,7 @@ class OrdersManager:
             'binance_coin_futures': BinanceExchangeCoinFuturesInterface,
             'binance_vanilla_options': BinanceExchangeVanillaOptionsInterface,
             'bitfinex': BitfinexExchangeInterface,
+            'tinkoff': TinkoffExchangeInterface,
         }
         self.exchange = self.exchanges[self.settings.EXCHANGE](key=self.settings.API_KEY,
                                                                secret=self.settings.API_SECRET,
@@ -113,19 +115,20 @@ class OrdersManager:
     async def run_loop(self):
         while True:
             try:
+                # print(self.exchange.get_orders_state(['27300393410', '27300497402', '27294756792']))
                 kw = self.get_data_for_calculations(self.orders_state)
-
-                self.logger.info(f"last_prices: {kw.get('last_prices')}")
-                self.logger.info(f"positions: {kw.get('positions')}")
-                self.logger.info("active_orders: ")
-                for order in kw.get("active_orders"):
-                    self.logger.info(f"  {order}")
-
-                orders_for_update = self.get_orders_for_update(kw)
-                for k, v in orders_for_update.items():
-                    self.logger.info(f"{k}: ")
-                    for order in v:
-                        self.logger.info(f"  {order}")
+                print(kw)
+                # self.logger.info(f"last_prices: {kw.get('last_prices')}")
+                # self.logger.info(f"positions: {kw.get('positions')}")
+                # self.logger.info("active_orders: ")
+                # for order in kw.get("active_orders"):
+                #     self.logger.info(f"  {order}")
+                #
+                # orders_for_update = self.get_orders_for_update(kw)
+                # for k, v in orders_for_update.items():
+                #     self.logger.info(f"{k}: ")
+                #     for order in v:
+                #         self.logger.info(f"  {order}")
 
                 # self.orders_state = orders_for_update.get('to_get_info') + \
                 #                     self.replace_orders(orders_for_update.get('to_create'),

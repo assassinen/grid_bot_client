@@ -162,7 +162,6 @@ class BinanceExchangeVanillaOptionsInterface(BinanceExchangeBaseInterface):
         return price[0].get('lastPrice') if len(price) > 0 else None
 
     def get_last_order_price(self, side):
-        # path = 'historyOrders'
         path = 'userTrades'
         params = {'symbol': self.instrument}
         result = self._request('get', f'{self.uri}/{path}', signed=True, force_params=True, data=params)
@@ -192,7 +191,6 @@ class BinanceExchangeVanillaOptionsInterface(BinanceExchangeBaseInterface):
         return open_orders + [self.get_order_state(order_id) for order_id in order_state_ids]
 
     def create_order(self, order=''):
-        # todo реализовать
         postdict = {
             'symbol': self.instrument,
             'side': order['side'].title(),
