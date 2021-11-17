@@ -28,7 +28,7 @@ class TinkoffExchangeInterface:
         self.session_id = self.get_session_id()
 
     def request(self, metod, endpoint, data={}, params=""):
-        url = f'{self.base_url}{self.api_url}{endpoint}'
+        url = f'{self.base_url}{endpoint}'
         params = {'sessionId': self.session_id}
         headers = {
             'authority': 'www.tinkoff.ru',
