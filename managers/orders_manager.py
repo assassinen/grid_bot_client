@@ -55,16 +55,21 @@ class OrdersManager:
         if len(to_cancel) > 0:
             self.logger.info("Canceling %d orders:" % (len(to_cancel)))
             for order in to_cancel:
-                self.logger.info(f"  {order}")
-                self.exchange.cancel_order(order)
+                try:
+                    self.exchange.cancel_order(order)
+                    self.logger.info(f"  {order}")
+                except Exception as err:
+                    self.logger.info(f"cancelling order error: {err}")
         if len(to_create) > 0:
             self.logger.info("Creating %d orders:" % (len(to_create)))
             for order in to_create:
-                responce = self.exchange.create_order(order)
-                orders_status.append(responce.get('order_id'))
-                self.logger.info("  %4s %.5f @ %.4f" % (
-                    responce.get('side'), responce.get('size'), responce.get('price')))
-
+                try:
+                    responce = self.exchange.create_order(order)
+                    orders_status.append(responce.get('order_id'))
+                    self.logger.info("  %4s %.5f @ %.4f" % (
+                        responce.get('side'), responce.get('size'), responce.get('price')))
+                except Exception as err:
+                    self.logger.info(f"added order error: {err}")
         return orders_status
 
     def set_settings(self):
@@ -115,24 +120,23 @@ class OrdersManager:
     async def run_loop(self):
         while True:
             try:
-                # print(self.exchange.get_orders_state(['27300393410', '27300497402', '27294756792']))
                 kw = self.get_data_for_calculations(self.orders_state)
-                print(kw)
-                # self.logger.info(f"last_prices: {kw.get('last_prices')}")
-                # self.logger.info(f"positions: {kw.get('positions')}")
-                # self.logger.info("active_orders: ")
-                # for order in kw.get("active_orders"):
-                #     self.logger.info(f"  {order}")
-                #
-                # orders_for_update = self.get_orders_for_update(kw)
-                # for k, v in orders_for_update.items():
-                #     self.logger.info(f"{k}: ")
-                #     for order in v:
-                #         self.logger.info(f"  {order}")
 
-                # self.orders_state = orders_for_update.get('to_get_info') + \
-                #                     self.replace_orders(orders_for_update.get('to_create'),
-                #                                         orders_for_update.get('to_cancel'))
+                self.logger.info(f"last_prices: {kw.get('last_prices')}")
+                self.logger.info(f"positions: {kw.get('positions')}")
+                self.logger.info("active_orders: ")
+                for order in kw.get("active_orders"):
+                    self.logger.info(f"  {order}")
+
+                orders_for_update = self.get_orders_for_update(kw)
+                for k, v in orders_for_update.items():
+                    self.logger.info(f"{k}: ")
+                    for order in v:
+                        self.logger.info(f"  {order}")
+
+                self.orders_state = orders_for_update.get('to_get_info')
+                self.orders_state += self.replace_orders(orders_for_update.get('to_create'),
+                                                         orders_for_update.get('to_cancel'))
             except Exception as err:
                 self.logger.info(f"{err}")
             await asyncio.sleep(self.settings.LOOP_INTERVAL)
