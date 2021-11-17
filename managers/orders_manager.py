@@ -52,16 +52,21 @@ class OrdersManager:
         if len(to_cancel) > 0:
             self.logger.info("Canceling %d orders:" % (len(to_cancel)))
             for order in to_cancel:
-                self.logger.info(f"  {order}")
-                self.exchange.cancel_order(order)
+                try:
+                    self.exchange.cancel_order(order)
+                    self.logger.info(f"  {order}")
+                except Exception as err:
+                    self.logger.info(f"cancelled order error: {err}")
         if len(to_create) > 0:
             self.logger.info("Creating %d orders:" % (len(to_create)))
             for order in to_create:
-                responce = self.exchange.create_order(order)
-                orders_status.append(responce.get('order_id'))
-                self.logger.info("  %4s %.2f @ %.4f" % (
-                    responce.get('side'), responce.get('size'), responce.get('price')))
-
+                try:
+                    responce = self.exchange.create_order(order)
+                    orders_status.append(responce.get('order_id'))
+                    self.logger.info("  %4s %.2f @ %.4f" % (
+                        responce.get('side'), responce.get('size'), responce.get('price')))
+                except Exception as err:
+                    self.logger.info(f"added order error: {err}")
         return orders_status
 
     def set_settings(self):
@@ -126,9 +131,9 @@ class OrdersManager:
                     for order in v:
                         self.logger.info(f"  {order}")
 
-                self.orders_state = orders_for_update.get('to_get_info') + \
-                                    self.replace_orders(orders_for_update.get('to_create'),
-                                                        orders_for_update.get('to_cancel'))
+                self.orders_state = orders_for_update.get('to_get_info')
+                self.orders_state += self.replace_orders(orders_for_update.get('to_create'),
+                                                         orders_for_update.get('to_cancel'))
             except Exception as err:
                 self.logger.info(f"{err}")
             await asyncio.sleep(self.settings.LOOP_INTERVAL)
