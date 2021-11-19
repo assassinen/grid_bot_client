@@ -54,6 +54,10 @@ class BitfinexExchangeInterface:
                             f"{response.request.url}",
                             f"{response.request.body}",
                             f"{response.text}")
+        if endpoint == f'auth/r/orders/{self.instrument}/hist':
+            self.logger.debug(response.request.url)
+            self.logger.debug(response.request.body)
+            self.logger.debug(response.json())
         return response.json()
 
     def _post(self, endpoint, data={}, params=""):
@@ -114,6 +118,8 @@ class BitfinexExchangeInterface:
         while len(not_found_orders) > 0 and retry > 0:
             self.logger.info(f"not_found_orders: {[order.get('order_id') for order in not_found_orders]}")
             time.sleep(1)
+            existing_orders = [self.get_order_params_from_responce(order)
+                               for order in self._post(method, params)] if len(params.get('id')) > 0 else []
             existing_orders_ids = [order.get('order_id') for order in existing_orders]
             not_found_orders = [{'price': None,
                                  'size': None,
