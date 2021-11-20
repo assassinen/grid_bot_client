@@ -158,3 +158,4 @@ local_settings.py
 .buildts
 settings/*
 logs/*
+tcs_main.py

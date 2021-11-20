@@ -1,12 +1,13 @@
 
 import asyncio
-import os.path
 import requests
 import jsonpickle
-from bitmex.exchange import BitmexExchangeInterface
-from deribit.exchange_v2 import DeribitExchangeInterface
-from binance.exchange import (BinanceExchangeVanillaOptionsInterface,
-                              BinanceExchangeCoinFuturesInterface)
+from ex_bitmex.exchange import BitmexExchangeInterface
+from exchanges.deribit import DeribitExchangeInterface
+from exchanges.binance import (BinanceExchangeVanillaOptionsInterface,
+                               BinanceExchangeCoinFuturesInterface)
+from exchanges.tinkoff import TinkoffExchangeInterface
+from exchanges.bitfinex import BitfinexExchangeInterface
 from models.log import setup_custom_logger
 
 
@@ -19,13 +20,15 @@ class OrdersManager:
             'deribit': DeribitExchangeInterface,
             'binance_coin_futures': BinanceExchangeCoinFuturesInterface,
             'binance_vanilla_options': BinanceExchangeVanillaOptionsInterface,
+            'bitfinex': BitfinexExchangeInterface,
+            'tinkoff': TinkoffExchangeInterface,
         }
         self.exchange = self.exchanges[self.settings.EXCHANGE](key=self.settings.API_KEY,
                                                                secret=self.settings.API_SECRET,
                                                                base_url=self.settings.BASE_URL,
                                                                api_url=self.settings.API_URL,
                                                                instrument=self.settings.SYMBOL)
-        self.logger = setup_custom_logger(f'orders_manager.{self.settings.API_KEY}')
+        self.logger = setup_custom_logger(f'orders_manager.{self.settings.API_KEY[:8]}')
         self.orders_state = []
         self.base_url = 'http://moneyprinter.pythonanywhere.com/api/v1.0/'
         # self.base_url = 'http://127.0.0.1:5000/api/v1.0/'
@@ -52,16 +55,21 @@ class OrdersManager:
         if len(to_cancel) > 0:
             self.logger.info("Canceling %d orders:" % (len(to_cancel)))
             for order in to_cancel:
-                self.logger.info(f"  {order}")
-                self.exchange.cancel_order(order)
+                try:
+                    self.exchange.cancel_order(order)
+                    self.logger.info(f"  {order}")
+                except Exception as err:
+                    self.logger.info(f"cancelling order error: {err}")
         if len(to_create) > 0:
             self.logger.info("Creating %d orders:" % (len(to_create)))
             for order in to_create:
-                responce = self.exchange.create_order(order)
-                orders_status.append(responce.get('order_id'))
-                self.logger.info("  %4s %.2f @ %.4f" % (
-                    responce.get('side'), responce.get('size'), responce.get('price')))
-
+                try:
+                    responce = self.exchange.create_order(order)
+                    orders_status.append(responce.get('order_id'))
+                    self.logger.info("  %4s %.5f @ %.4f" % (
+                        responce.get('side'), responce.get('size'), responce.get('price')))
+                except Exception as err:
+                    self.logger.info(f"added order error: {err}")
         return orders_status
 
     def set_settings(self):
@@ -126,9 +134,9 @@ class OrdersManager:
                     for order in v:
                         self.logger.info(f"  {order}")
 
-                self.orders_state = orders_for_update.get('to_get_info') + \
-                                    self.replace_orders(orders_for_update.get('to_create'),
-                                                        orders_for_update.get('to_cancel'))
+                self.orders_state = orders_for_update.get('to_get_info')
+                self.orders_state += self.replace_orders(orders_for_update.get('to_create'),
+                                                         orders_for_update.get('to_cancel'))
             except Exception as err:
                 self.logger.info(f"{err}")
             await asyncio.sleep(self.settings.LOOP_INTERVAL)
