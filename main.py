@@ -4,7 +4,8 @@ import time
 import json
 import requests
 
-
+API_KEY = "At880SOrP7kmCq220rtDqTIPHEdQf6BV901UJ9exHiT"
+API_SECRET = "662HSheU6XnnafYpQk9Je5AcPYz4SfdO2VwjPVxbRDY"
 
 def _gen_nonce():
   return int(round(time.time() * 1000000))
@@ -60,7 +61,7 @@ def post(endpoint, data={}, params=""):
 # # body = {'symbol': 'tBTCUSD'}
 # #
 endpoint = f'auth/r/orders/tBTCUSD/hist'
-body = {'id': [79087397732]}
+body = {'id': [79228233553]}
 r = post(endpoint, body)
 # print(r.request.headers)
 for i in r.json():

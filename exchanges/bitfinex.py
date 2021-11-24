@@ -99,7 +99,7 @@ class BitfinexExchangeInterface:
             else {'order_id': order_id, 'order_state': 'cancelled'}
 
     def get_orders_state(self, order_state_ids):
-        retry = 5
+        retry = 50
         open_orders = self.get_open_orders()
         open_orders_ids = [open_order.get('order_id') for open_order in open_orders]
         method = f'auth/r/orders/{self.instrument}/hist'
@@ -120,6 +120,8 @@ class BitfinexExchangeInterface:
             time.sleep(1)
             existing_orders = [self.get_order_params_from_responce(order)
                                for order in self._post(method, params)] if len(params.get('id')) > 0 else []
+            self.logger.info(f"params retry #{51 - retry}: {params}")
+            self.logger.info(f"existing_orders retry #{51-retry}: {existing_orders}")
             existing_orders_ids = [order.get('order_id') for order in existing_orders]
             not_found_orders = [{'price': None,
                                  'size': None,
