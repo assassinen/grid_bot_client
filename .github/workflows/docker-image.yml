@@ -17,5 +17,6 @@ jobs:
     - name: Build the Docker image
       run: |
           echo test, and deploy your project.
+          echo ${{ secrets.DOCKER_USERNAME }}
           echo ${{ secrets.GITHUB_TOKEN }}
           docker build . --file Dockerfile --tag my-image-name:$(date +%s)
