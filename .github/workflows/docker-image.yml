@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: assassinen
+    - uses: actions/assassinen
     - name: Build the Docker image
       run: |
           echo test, and deploy your project.
