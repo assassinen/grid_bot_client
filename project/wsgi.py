@@ -4,16 +4,9 @@ from project import app
 
 main = Blueprint('main', __name__)
 
-# app = create_app()
-
-#
-# @main.route('/')
-# def index():
-#     return render_template('index.html')
 
 @main.route('/')
 @main.route('/index')
-@login_required
 def index():
     user = {'username': 'Miguel'}
     posts = [
@@ -32,7 +25,7 @@ def index():
 @main.route('/profile')
 @login_required
 def profile():
-    return render_template('profile.html', name=current_user.name)
+    return render_template('profile.html', name=current_user.username)
 
 if __name__ == '__main__':
     app.run()
