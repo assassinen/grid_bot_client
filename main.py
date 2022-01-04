@@ -5,8 +5,6 @@ import json
 import requests
 
 
-API_KEY = ''
-API_SECRET = ''
 
 def _gen_nonce():
   return int(round(time.time() * 1000000))
@@ -62,32 +60,12 @@ def post(endpoint, data={}, params=""):
 # # body = {'symbol': 'tBTCUSD'}
 # #
 endpoint = f'auth/r/orders/tBTCUSD/hist'
-body = {'id': [78161127709,
-78160898992,
-78160738547,
-78160735843,
-78160455519,
-78160318854,
-78159751849,
-78156290646,
-78155904086,
-78151321434,
-78151144361,
-78150939048,
-78149651309,
-78149422266,
-78148562096,
-78148132503,
-78145646616,
-78145120341,
-78144161502,
-78143669906,
-78139207893,
-78139094713]}
+body = {'id': [79228233553]}
 r = post(endpoint, body)
 # print(r.request.headers)
 for i in r.json():
-    print(i[5])
+    print(i)
+    # print(i[5])
 
 
     # async with aiohttp.ClientSession() as session:

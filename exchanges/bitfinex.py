@@ -17,7 +17,7 @@ class BitfinexExchangeInterface:
         self.refresh_token = None
         self.expires_in = 0
         self.instrument = instrument
-        self.logger = setup_custom_logger(f'bitfinex_exchange.{self.key}')
+        self.logger = setup_custom_logger(f'bitfinex_exchange.{self.key[:8]}')
 
     def generate_auth_headers(self, path, body):
         """
@@ -54,10 +54,10 @@ class BitfinexExchangeInterface:
                             f"{response.request.url}",
                             f"{response.request.body}",
                             f"{response.text}")
-        if endpoint == f'auth/r/orders/{self.instrument}/hist':
-            self.logger.debug(response.request.url)
-            self.logger.debug(response.request.body)
-            self.logger.debug(response.json())
+        # if endpoint == f'auth/r/orders/{self.instrument}/hist':
+        #     self.logger.info(response.request.url)
+        #     self.logger.info(response.request.body)
+        #     self.logger.info(response.json())
         return response.json()
 
     def _post(self, endpoint, data={}, params=""):
@@ -99,7 +99,7 @@ class BitfinexExchangeInterface:
             else {'order_id': order_id, 'order_state': 'cancelled'}
 
     def get_orders_state(self, order_state_ids):
-        retry = 3
+        retry = 50
         open_orders = self.get_open_orders()
         open_orders_ids = [open_order.get('order_id') for open_order in open_orders]
         method = f'auth/r/orders/{self.instrument}/hist'
@@ -120,12 +120,14 @@ class BitfinexExchangeInterface:
             time.sleep(1)
             existing_orders = [self.get_order_params_from_responce(order)
                                for order in self._post(method, params)] if len(params.get('id')) > 0 else []
+            self.logger.info(f"params retry #{51 - retry}: {params}")
+            self.logger.info(f"existing_orders retry #{51-retry}: {existing_orders}")
             existing_orders_ids = [order.get('order_id') for order in existing_orders]
             not_found_orders = [{'price': None,
                                  'size': None,
                                  'side': None,
                                  'order_id': order_id,
-                                 'status': 'cancelled',
+                                 'status': 'unknown',
                                  'timestamp': None} for order_id in order_state_ids
                                 if order_id not in existing_orders_ids + open_orders_ids]
             retry -= 1

@@ -15,6 +15,8 @@ class OrdersManager:
 
     def __init__(self, settings):
         self.settings = settings
+        self.name = settings.API_KEY
+        self.active = settings.active
         self.exchanges = {
             'bitmex': BitmexExchangeInterface,
             'deribit': DeribitExchangeInterface,

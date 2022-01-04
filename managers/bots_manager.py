@@ -17,3 +17,6 @@ class BotsManager():
 
     def get_orders_managers(self):
         return self.orders_managers
+
+    def get_all_orders_managers(self):
+        return [OrdersManager(setting) for setting in self.load_settings()]
