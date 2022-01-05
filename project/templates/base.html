@@ -15,6 +15,7 @@
 
     Microblog:
     <a href="{{ url_for('main.index') }}">Home</a>
+    <a href="{{ url_for('main.explore') }}">Explore</a>
     {% if current_user.is_anonymous %}
     <a href="{{ url_for('users.login') }}">Login</a>
     {% else %}

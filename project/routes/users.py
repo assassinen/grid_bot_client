@@ -2,9 +2,9 @@ from datetime import datetime
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_user, current_user, logout_user, login_required
 from werkzeug.urls import url_parse
-from .. import db
+from .. import db, app
 from ..forms import LoginForm, RegistrationForm, EditProfileForm, EmptyForm
-from ..models import User
+from ..models import User, Post
 
 users = Blueprint('users', __name__)
 
@@ -58,13 +58,13 @@ def logout():
 @users.route('/users/<username>')
 @login_required
 def profile(username):
-    user = User.query.filter_by(username=username).first_or_404()
-    posts = [
-        {'author': user, 'body': 'Test post #1'},
-        {'author': user, 'body': 'Test post #2'}
-    ]
     form = EmptyForm()
-    return render_template('profile.html', user=user, posts=posts, form=form)
+    user = User.query.filter_by(username=username).first_or_404()
+    page = request.args.get('page', 1, type=int)
+    posts = user.posts.order_by(Post.timestamp.desc()).paginate(page, app.config['POSTS_PER_PAGE'], False)
+    next_url = url_for('users.profile', username=user.username, page=posts.next_num) if posts.has_next else None
+    prev_url = url_for('users.profile', username=user.username, page=posts.prev_num) if posts.has_prev else None
+    return render_template('profile.html', user=user, posts=posts.items, next_url=next_url, prev_url=prev_url, form=form)
 
 
 @users.route('/edit_profile', methods=['GET', 'POST'])
