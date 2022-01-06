@@ -9,10 +9,12 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_mail import Mail, Message
 from flask_bootstrap import Bootstrap
+from flask_moment import Moment
 
 
 app = Flask(__name__)
 bootstrap = Bootstrap(app)
+moment = Moment(app)
 app.config.from_object(Config)
 mail = Mail(app)
 db = SQLAlchemy(app)
