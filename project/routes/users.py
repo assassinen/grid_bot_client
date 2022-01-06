@@ -2,7 +2,7 @@ from datetime import datetime
 from flask import Blueprint, render_template, redirect, url_for, request, flash
 from flask_login import login_user, current_user, logout_user, login_required
 from werkzeug.urls import url_parse
-from .. import db
+from .. import db, app
 from ..forms import (LoginForm,
                      RegistrationForm,
                      EditProfileForm,
