@@ -16,7 +16,7 @@ class DeribitExchangeInterface:
         self.instrument = instrument
         
     def _auth(self):
-        method = 'public/auth'
+        method = 'public/users'
         params = {
             'grant_type': 'client_credentials',
             'client_secret': self.secret,
@@ -36,7 +36,7 @@ class DeribitExchangeInterface:
             'method': method,
             'params': params
         }
-        if method != 'public/auth' and self.expires_in < time.time():
+        if method != 'public/users' and self.expires_in < time.time():
             self._auth()
         if method.startswith('private'):
             headers['Authorization'] = 'Bearer {}'.format(self.access_token)

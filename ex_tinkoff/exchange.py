@@ -32,7 +32,7 @@ class TinkoffExchangeInterface:
         params = {'sessionId': self.session_id}
         headers = {
             'authority': 'www.tinkoff.ru',
-            'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.80 Safari/537.36',
+            'users-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.80 Safari/537.36',
             'content-type': 'application/json',
             'accept': '*/*',
             'origin': 'https://www.tinkoff.ru',
@@ -108,7 +108,7 @@ class TinkoffExchangeInterface:
         return data.get('session_id')
 
     def get_open_orders(self):
-        metod = '/user/orders'
+        metod = '/users/orders'
         return self._post(metod)
         # result = self._post_(metod, referer, data={})
         # orders = result['payload'] if result.get('payload') is not None else {}

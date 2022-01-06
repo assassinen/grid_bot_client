@@ -4,8 +4,6 @@ import asyncio
 
 bots = BotsManager()
 
-orders_сalculators = bots.get_orders_сalculators()
-
 loop = asyncio.get_event_loop()
 
 for orders_manager in bots.get_orders_managers():

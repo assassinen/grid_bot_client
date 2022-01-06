@@ -32,8 +32,8 @@ class OrdersManager:
                                                                instrument=self.settings.SYMBOL)
         self.logger = setup_custom_logger(f'orders_manager.{self.settings.API_KEY[:8]}')
         self.orders_state = []
-        self.base_url = 'http://moneyprinter.pythonanywhere.com/api/v1.0/'
-        # self.base_url = 'http://127.0.0.1:5000/api/v1.0/'
+        # self.base_url = 'http://moneyprinter.pythonanywhere.com/api/v1.0/'
+        self.base_url = 'http://127.0.0.1:5000/api/v1.0/'
         self.orders_calculator_url = f'{self.base_url}orders_calculator/{self.settings.API_KEY}:{self.settings.SYMBOL}'
         self.set_settings_url = f'{self.base_url}set_settings/{self.settings.API_KEY}:{self.settings.SYMBOL}'
         self.set_settings()
@@ -123,7 +123,6 @@ class OrdersManager:
         while True:
             try:
                 kw = self.get_data_for_calculations(self.orders_state)
-
                 self.logger.info(f"last_prices: {kw.get('last_prices')}")
                 self.logger.info(f"positions: {kw.get('positions')}")
                 self.logger.info("active_orders: ")
@@ -131,6 +130,7 @@ class OrdersManager:
                     self.logger.info(f"  {order}")
 
                 orders_for_update = self.get_orders_for_update(kw)
+
                 for k, v in orders_for_update.items():
                     self.logger.info(f"{k}: ")
                     for order in v:

@@ -4,7 +4,8 @@ import time
 import json
 import requests
 
-
+API_KEY = "At880SOrP7kmCq220rtDqTIPHEdQf6BV901UJ9exHiT"
+API_SECRET = "662HSheU6XnnafYpQk9Je5AcPYz4SfdO2VwjPVxbRDY"
 
 def _gen_nonce():
   return int(round(time.time() * 1000000))
@@ -38,8 +39,8 @@ def post(endpoint, data={}, params=""):
     return requests.post(url + params, headers=headers, data=sData)
 
 
-# endpoint = 'auth/r/wallets'
-# endpoint = f'auth/r/orders'
+# endpoint = 'users/r/wallets'
+# endpoint = f'users/r/orders'
 # params = {'limit': 77337856078}
 # # r = post(endpoint, params)
 # r = post(endpoint)
@@ -47,7 +48,7 @@ def post(endpoint, data={}, params=""):
 # print(r.request.url)
 # print(r.text)
 #
-# endpoint = 'auth/w/order/submit'
+# endpoint = 'users/w/order/submit'
 # body = {'type': 'EXCHANGE LIMIT',
 #         'symbol': 'tBTCUSD',
 #         'price': '55263',
@@ -56,7 +57,7 @@ def post(endpoint, data={}, params=""):
 #         # 'meta': {'aff_code': "AFF_CODE_HERE"}
 # }
 
-# endpoint = 'auth/w/position/increase'
+# endpoint = 'users/w/position/increase'
 # # body = {'symbol': 'tBTCUSD'}
 # #
 endpoint = f'auth/r/orders/tBTCUSD/hist'

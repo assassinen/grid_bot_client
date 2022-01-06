@@ -61,7 +61,10 @@ class BinanceExchangeBaseInterface:
 
     def _request(self, method, uri, signed, force_params=False, **kwargs):
         kwargs = self._get_request_kwargs(method, signed, force_params, **kwargs)
-        self.response = getattr(self.session, method)(uri, **kwargs)
+        try:
+            self.response = getattr(self.session, method)(uri, **kwargs)
+        except Exception as err:
+            print(err)
         return self._handle_response(self.response)
 
     @staticmethod

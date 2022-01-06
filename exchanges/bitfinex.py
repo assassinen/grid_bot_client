@@ -54,7 +54,7 @@ class BitfinexExchangeInterface:
                             f"{response.request.url}",
                             f"{response.request.body}",
                             f"{response.text}")
-        # if endpoint == f'auth/r/orders/{self.instrument}/hist':
+        # if endpoint == f'users/r/orders/{self.instrument}/hist':
         #     self.logger.info(response.request.url)
         #     self.logger.info(response.request.body)
         #     self.logger.info(response.json())
@@ -67,7 +67,7 @@ class BitfinexExchangeInterface:
         return self.request('GET', endpoint, data=data, params=params)
 
     def get_positions(self):
-        endpoint = 'auth/r/wallets'
+        endpoint = 'users/r/wallets'
         wallet = [wallet for wallet in self._post(endpoint) if wallet[0] == 'exchange' and wallet[1] == 'BTC']
         wallet = wallet[0] if len(wallet) > 0 else wallet
         size = round(wallet[2], 10) if len(wallet) > 0 else 0
@@ -79,7 +79,7 @@ class BitfinexExchangeInterface:
         return self._get(endpoint, params)[0][3]
 
     def get_last_order_price(self, side):
-        endpoint = f'auth/r/trades/{self.instrument}/hist'
+        endpoint = f'users/r/trades/{self.instrument}/hist'
         if side == 'buy':
             last_order_price = [i[5] for i in self._post(endpoint) if i[4] > 0]
         else:
@@ -87,12 +87,12 @@ class BitfinexExchangeInterface:
         return last_order_price[0] if len(last_order_price) > 0 else self.get_last_trade_price()
 
     def get_open_orders(self):
-        method = f'auth/r/orders/{self.instrument}'
+        method = f'users/r/orders/{self.instrument}'
         open_orders = self._post(method)
         return [self.get_order_params_from_responce(order) for order in open_orders]
 
     def get_order_state(self, order_id):
-        method = f'auth/r/orders/{self.instrument}/hist'
+        method = f'users/r/orders/{self.instrument}/hist'
         params = {'id': [order_id]}
         order = self._post(method, params)
         return self.get_order_params_from_responce(order[0]) if len(order) > 0 \
@@ -102,7 +102,7 @@ class BitfinexExchangeInterface:
         retry = 50
         open_orders = self.get_open_orders()
         open_orders_ids = [open_order.get('order_id') for open_order in open_orders]
-        method = f'auth/r/orders/{self.instrument}/hist'
+        method = f'users/r/orders/{self.instrument}/hist'
         params = {'id': order_state_ids + open_orders_ids}
         existing_orders = [self.get_order_params_from_responce(order)
                            for order in self._post(method, params)] if len(params.get('id')) > 0 else []
@@ -155,7 +155,7 @@ class BitfinexExchangeInterface:
 
     def create_order(self, order):
         ratio = 1 if order['side'] == 'buy' else -1
-        method = f'auth/w/order/submit'
+        method = f'users/w/order/submit'
         params = {'type': 'EXCHANGE LIMIT',
                   'symbol': self.instrument,
                   'price': str(order['price']),
@@ -166,7 +166,7 @@ class BitfinexExchangeInterface:
             return [self.get_order_params_from_responce(orders) for orders in result[4]][0]
 
     def cancel_order(self, order_id):
-        method = f'auth/w/order/cancel'
+        method = f'users/w/order/cancel'
         params = {'id': int(order_id)}
         result = self._post(method, params)
         if 'SUCCESS' in result:

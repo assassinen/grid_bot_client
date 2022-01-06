@@ -6,3 +6,5 @@ script:
   - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
   - docker build -t assassinen/grid_bot_client:$TAG .
   - docker push assassinen/grid_bot_client:$TAG
+
+docker build . --file Dockerfile --tag my-image-name:$(date +%s)

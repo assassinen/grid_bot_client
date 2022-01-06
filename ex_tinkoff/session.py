@@ -16,7 +16,7 @@ class Session():
         self.logger = setup_custom_logger(f'session.{self.key}')
 
     def auth(self):
-        method = 'public/auth'
+        method = 'public/users'
         params = {
             'grant_type': 'client_credentials',
             'client_secret': self.secret,
@@ -36,7 +36,7 @@ class Session():
             'method': method,
             'params': params
         }
-        if method != 'public/auth' and self.expires_in < time.time():
+        if method != 'public/users' and self.expires_in < time.time():
             self.auth()
         if method.startswith('private'):
             headers['Authorization'] = 'Bearer {}'.format(self.access_token)
