@@ -8,15 +8,18 @@ from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_mail import Mail, Message
+from flask_bootstrap import Bootstrap
 
 
 app = Flask(__name__)
+bootstrap = Bootstrap(app)
 app.config.from_object(Config)
 mail = Mail(app)
 db = SQLAlchemy(app)
 migrate = Migrate(app, db)
 login = LoginManager(app)
 login.login_view = 'users.login'
+login.login_message = "Пожалуйста, войдите, чтобы открыть эту страницу."
 
 
 from .routes.bots import bots as bots_blueprint

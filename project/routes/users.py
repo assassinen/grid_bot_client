@@ -10,7 +10,7 @@ from ..forms import (LoginForm,
                      ResetPasswordRequestForm,
                      ResetPasswordForm)
 from ..models import User, Post
-from project.email_sender import send_password_reset_email
+from ..email_sender import send_password_reset_email
 
 users = Blueprint('users', __name__)
 
