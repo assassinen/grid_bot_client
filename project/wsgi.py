@@ -19,6 +19,9 @@ def internal_error(error):
 
 
 @main.route('/', methods=['GET', 'POST'])
+def start():
+    return 'Hello'
+
 @main.route('/index', methods=['GET', 'POST'])
 @login_required
 def index():

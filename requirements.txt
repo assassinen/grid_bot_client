@@ -13,3 +13,4 @@ Flask-WTF==0.15.1
 WTForms==2.3.3
 flask-bootstrap==3.3.7.1
 flask-moment==1.0.2
+flask-babel==2.0.0
