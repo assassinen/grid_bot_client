@@ -6,6 +6,7 @@ class Settings:
     def __init__(self,
                  API_KEY,
                  API_SECRET,
+                 TOKEN,
                  BASE_URL,
                  API_URL,
                  LOOP_INTERVAL,
@@ -23,6 +24,7 @@ class Settings:
                  ):
         self.API_KEY = API_KEY
         self.API_SECRET = API_SECRET
+        self.TOKEN = TOKEN
         self.BASE_URL = BASE_URL
         self.API_URL = API_URL
         self.LOOP_INTERVAL = LOOP_INTERVAL

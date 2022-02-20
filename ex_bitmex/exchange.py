@@ -13,7 +13,7 @@ class BitmexExchangeInterface:
                 '&columns=%5B%22avgEntryPrice%22%5D'.format(self.instrument)
         result = self.session.get('position', query)
         positions = result[0] if result else {}
-        return {'average_price': positions.get('avgEntryPrice', 0),
+        return {'price': positions.get('avgEntryPrice', 0),
                 'size': positions.get('currentQty', 0)}
 
     def get_last_trade_price(self):

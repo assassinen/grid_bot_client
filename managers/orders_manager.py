@@ -23,6 +23,8 @@ class OrdersManager:
             'bitfinex': BitfinexExchangeInterface,
             'tinkoff': TinkoffExchangeInterface,
         }
+        self.headers = {'Authorization': f'Bearer {settings.TOKEN}',
+                        'Content-Type': 'application/json'}
         self.exchange = self.exchanges[self.settings.EXCHANGE](key=self.settings.API_KEY,
                                                                secret=self.settings.API_SECRET,
                                                                base_url=self.settings.BASE_URL,
@@ -30,9 +32,10 @@ class OrdersManager:
                                                                instrument=self.settings.SYMBOL)
         self.logger = setup_custom_logger(f'orders_manager.{self.settings.API_KEY[:8]}')
         self.orders_state = []
-        self.base_url = 'http://moneyprinter.pythonanywhere.com/api/v1.0/'
-        # self.base_url = 'http://127.0.0.1:5000/api/v1.0/'
-        self.orders_calculator_url = f'{self.base_url}orders_calculator/{self.settings.API_KEY}:{self.settings.SYMBOL}'
+        self.base_url = 'http://grid-bot-server.herokuapp.com/api/v2.0/'
+        # self.base_url = 'http://127.0.0.1:5000/api/v2.0/'
+        self.orders_calculator_url = f'{self.base_url}orders_calculator_by_{self.settings.strategy}/' \
+                                     f'{self.settings.API_KEY}:{self.settings.SYMBOL}'
         self.set_settings_url = f'{self.base_url}set_settings/{self.settings.API_KEY}:{self.settings.SYMBOL}'
         self.set_settings()
 
@@ -42,11 +45,12 @@ class OrdersManager:
                         if s.API_KEY == self.API_KEY]
             return settings[0]
 
-    def get_data_for_calculations(self, orders_state):
+    def get_data_for_calculations(self):
         return {
                 'last_prices': {'trade_price': self.exchange.get_last_trade_price(),
                                 'order_price': self.exchange.get_last_order_price(self.settings.GRID_SIDE)},
-                'active_orders': self.exchange.get_orders_state(orders_state),
+                'trades': self.exchange.get_trades(),
+                'open_orders': self.exchange.get_open_orders(),
                 'positions': self.exchange.get_positions(),
         }
 
@@ -92,10 +96,10 @@ class OrdersManager:
             )
 
     def get_orders_for_update(self, kw):
-        orders_for_update = requests.post(url=self.orders_calculator_url, json=kw)
+        orders_for_update = requests.post(url=self.orders_calculator_url, headers=self.headers, json=kw)
         try:
             status_code = orders_for_update.status_code
-            result = orders_for_update.json().get('result')
+            result = orders_for_update.json()
             if status_code == 400 and result == 'exchange_settings not found':
                 self.logger.info(f'result: {result}')
                 self.set_settings()
@@ -120,13 +124,16 @@ class OrdersManager:
     async def run_loop(self):
         while True:
             try:
-                kw = self.get_data_for_calculations(self.orders_state)
+                kw = self.get_data_for_calculations()
 
                 self.logger.info(f"last_prices: {kw.get('last_prices')}")
                 self.logger.info(f"positions: {kw.get('positions')}")
-                self.logger.info("active_orders: ")
-                for order in kw.get("active_orders"):
+                self.logger.info("open_orders: ")
+                for order in kw.get("open_orders"):
                     self.logger.info(f"  {order}")
+                self.logger.info("trades: ")
+                for trade in kw.get("trades"):
+                    self.logger.info(f"  {trade}")
 
                 orders_for_update = self.get_orders_for_update(kw)
                 for k, v in orders_for_update.items():
@@ -134,7 +141,7 @@ class OrdersManager:
                     for order in v:
                         self.logger.info(f"  {order}")
 
-                self.orders_state = orders_for_update.get('to_get_info')
+                # self.orders_state = orders_for_update.get('to_get_info')
                 self.orders_state += self.replace_orders(orders_for_update.get('to_create'),
                                                          orders_for_update.get('to_cancel'))
             except Exception as err:
