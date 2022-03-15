@@ -148,8 +148,7 @@ class OrdersManager:
 
                 orders_for_update = self.get_orders_for_update(kw)
                 for k, v in orders_for_update.items():
-                    if len(v) > 0:
-                        self.logger.info(f"{k}: ")
+                    self.logger.info(f"{k}: ")
                     if k == 'last_db_trade_time':
                         time.sleep(0.001)
                         self.logger.info(f"  {v}")
