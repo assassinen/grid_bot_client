@@ -1,12 +1,15 @@
 import asyncio
-import requests
+import time
+
 import jsonpickle
+import requests
+
 from ex_bitmex.exchange import BitmexExchangeInterface
-from exchanges.deribit import DeribitExchangeInterface
 from exchanges.binance import (BinanceExchangeVanillaOptionsInterface,
                                BinanceExchangeCoinFuturesInterface)
-from exchanges.tinkoff import TinkoffExchangeInterface
 from exchanges.bitfinex import BitfinexExchangeInterface
+from exchanges.deribit import DeribitExchangeInterface
+from exchanges.tinkoff import TinkoffExchangeInterface
 from models.log import setup_custom_logger
 
 
@@ -64,6 +67,7 @@ class OrdersManager:
                     self.logger.info(f"  {order}")
                 except Exception as err:
                     self.logger.info(f"cancelling order error: {err}")
+            time.sleep(0.001)
         if len(to_create) > 0:
             self.logger.info("Creating %d orders:" % (len(to_create)))
             for order in to_create:
@@ -74,6 +78,7 @@ class OrdersManager:
                         responce.get('side'), responce.get('size'), responce.get('price')))
                 except Exception as err:
                     self.logger.info(f"added order error: {err}")
+            time.sleep(0.001)
         return orders_status
 
     def set_settings(self):
@@ -132,21 +137,25 @@ class OrdersManager:
                 self.logger.info("open_orders: ")
                 for order in kw.get("open_orders"):
                     self.logger.info(f"  {order}")
+                time.sleep(0.001)
                 self.logger.info("trades: ")
                 for trade in kw.get("trades"):
                     self.logger.info(f"  {trade}")
+                time.sleep(0.001)
 
                 orders_for_update = self.get_orders_for_update(kw)
                 for k, v in orders_for_update.items():
                     self.logger.info(f"{k}: ")
                     if k == 'last_db_trade_time':
                         self.logger.info(f"  {v}")
+                        time.sleep(0.001)
                     else:
                         for order in v:
                             self.logger.info(f"  {order}")
+                        time.sleep(0.001)
 
                 self.last_trade_time = orders_for_update.get('last_db_trade_time', self.last_trade_time)
-
+                time.sleep(0.001)
                 self.replace_orders(orders_for_update.get('to_create'),
                                     orders_for_update.get('to_cancel'))
             except Exception as err:
