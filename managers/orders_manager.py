@@ -99,7 +99,6 @@ class OrdersManager:
         orders_for_update = requests.post(url=self.orders_calculator_url, headers=self.headers, json=kw)
         try:
             status_code = orders_for_update.status_code
-            print(orders_for_update.text)
             result = orders_for_update.json()
             if status_code == 400 and result == 'exchange_settings not found':
                 self.logger.info(f'result: {result}')
@@ -112,6 +111,7 @@ class OrdersManager:
             else:
                 raise SetSettings(
                     f'status_code: {status_code}'
+                    f'response: {orders_for_update.text}'
                 )
         except Exception as err:
             raise err
@@ -147,8 +147,8 @@ class OrdersManager:
 
                 self.last_trade_time = orders_for_update.get('last_db_trade_time', self.last_trade_time)
 
-                # self.replace_orders(orders_for_update.get('to_create'),
-                #                     orders_for_update.get('to_cancel'))
+                self.replace_orders(orders_for_update.get('to_create'),
+                                    orders_for_update.get('to_cancel'))
             except Exception as err:
                 self.logger.info(f"{err}")
             await asyncio.sleep(self.settings.LOOP_INTERVAL)
