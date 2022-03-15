@@ -134,6 +134,7 @@ class OrdersManager:
 
                 self.logger.info(f"last_prices: {kw.get('last_prices')}")
                 self.logger.info(f"positions: {kw.get('positions')}")
+                time.sleep(0.001)
                 self.logger.info("open_orders: ")
                 time.sleep(0.001)
                 for order in kw.get("open_orders"):
