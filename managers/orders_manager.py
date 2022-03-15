@@ -135,10 +135,12 @@ class OrdersManager:
                 self.logger.info(f"last_prices: {kw.get('last_prices')}")
                 self.logger.info(f"positions: {kw.get('positions')}")
                 self.logger.info("open_orders: ")
+                time.sleep(0.001)
                 for order in kw.get("open_orders"):
                     self.logger.info(f"  {order}")
                 time.sleep(0.001)
                 self.logger.info("trades: ")
+                time.sleep(0.001)
                 for trade in kw.get("trades"):
                     self.logger.info(f"  {trade}")
                 time.sleep(0.001)
@@ -147,6 +149,7 @@ class OrdersManager:
                 for k, v in orders_for_update.items():
                     self.logger.info(f"{k}: ")
                     if k == 'last_db_trade_time':
+                        time.sleep(0.001)
                         self.logger.info(f"  {v}")
                         time.sleep(0.001)
                     else:
