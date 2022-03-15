@@ -38,6 +38,7 @@ class OrdersManager:
                                      f'{self.settings.API_KEY}:{self.settings.SYMBOL}'
         self.set_settings_url = f'{self.base_url}set_settings/{self.settings.API_KEY}:{self.settings.SYMBOL}'
         self.set_settings()
+        self.last_trade_time = 1
 
     def load_settings(self, file):
         with open(f'{file}.json') as f:
@@ -47,11 +48,11 @@ class OrdersManager:
 
     def get_data_for_calculations(self):
         return {
+                'trades': self.exchange.get_trades(self.last_trade_time),
                 'last_prices': {'trade_price': self.exchange.get_last_trade_price(),
                                 'order_price': self.exchange.get_last_order_price(self.settings.GRID_SIDE)},
-                'trades': self.exchange.get_trades(),
-                'open_orders': self.exchange.get_open_orders(),
                 'positions': self.exchange.get_positions(),
+                'open_orders': self.exchange.get_open_orders(),
         }
 
     def replace_orders(self, to_create, to_cancel):
@@ -99,6 +100,7 @@ class OrdersManager:
         orders_for_update = requests.post(url=self.orders_calculator_url, headers=self.headers, json=kw)
         try:
             status_code = orders_for_update.status_code
+            print(orders_for_update.text)
             result = orders_for_update.json()
             if status_code == 400 and result == 'exchange_settings not found':
                 self.logger.info(f'result: {result}')
@@ -138,12 +140,16 @@ class OrdersManager:
                 orders_for_update = self.get_orders_for_update(kw)
                 for k, v in orders_for_update.items():
                     self.logger.info(f"{k}: ")
-                    for order in v:
-                        self.logger.info(f"  {order}")
+                    if k == 'last_db_trade_time':
+                        self.logger.info(f"  {v}")
+                    else:
+                        for order in v:
+                            self.logger.info(f"  {order}")
 
-                # self.orders_state = orders_for_update.get('to_get_info')
-                self.orders_state += self.replace_orders(orders_for_update.get('to_create'),
-                                                         orders_for_update.get('to_cancel'))
+                self.last_trade_time = orders_for_update.get('last_db_trade_time', self.last_trade_time)
+
+                self.replace_orders(orders_for_update.get('to_create'),
+                                    orders_for_update.get('to_cancel'))
             except Exception as err:
                 self.logger.info(f"{err}")
             await asyncio.sleep(self.settings.LOOP_INTERVAL)

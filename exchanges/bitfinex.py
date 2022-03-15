@@ -17,7 +17,6 @@ class BitfinexExchangeInterface:
         self.refresh_token = None
         self.expires_in = 0
         self.instrument = instrument
-        self.last_trade_time = 1
         self.logger = setup_custom_logger(f'bitfinex_exchange.{self.key}')
 
     def generate_auth_headers(self, path, body):
@@ -94,7 +93,7 @@ class BitfinexExchangeInterface:
 
     def get_trade_params_from_responce(self, responce):
         side = 'buy' if responce[4] > 0 else 'sell'
-        ratio = 1 if responce[5] > 0 else -1
+        ratio = 1 if responce[4] > 0 else -1
         return {'trade_id': responce[0],
                 'price': responce[5],
                 'size': responce[4] * ratio,
@@ -102,14 +101,15 @@ class BitfinexExchangeInterface:
                 'timestamp': responce[2]
                 }
 
-    def get_trades(self):
+    def get_trades(self, last_trade_time):
         endpoint = f'auth/r/trades/{self.instrument}/hist'
-        params = {'start': self.last_trade_time + 1}
+        params = {'start': last_trade_time,
+                  'limit': 2000}
         trades = self._post(endpoint, params)
-        if len(trades) > 0:
-            self.last_trade_time = self.get_trade_params_from_responce(trades[0]).get('timestamp')
-        else:
-            self.last_trade_time = int(time.time() * 1000)
+        # if len(trades) > 0:
+        #     self.last_trade_time = self.get_trade_params_from_responce(trades[0]).get('timestamp')
+        # else:
+        #     self.last_trade_time = int(time.time() * 1000)
         return [self.get_trade_params_from_responce(trade) for trade in trades]
 
     def get_order_state(self, order_id):
