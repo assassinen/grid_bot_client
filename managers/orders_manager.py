@@ -1,4 +1,3 @@
-
 import asyncio
 import requests
 import jsonpickle
@@ -104,7 +103,7 @@ class OrdersManager:
             result = orders_for_update.json()
             if status_code == 400 and result == 'exchange_settings not found':
                 self.logger.info(f'result: {result}')
-                self.set_settings()
+                # self.set_settings()
                 raise SetSettings(
                     f'the exchange_settings will be available in the next iteration'
                 )
@@ -148,8 +147,8 @@ class OrdersManager:
 
                 self.last_trade_time = orders_for_update.get('last_db_trade_time', self.last_trade_time)
 
-                self.replace_orders(orders_for_update.get('to_create'),
-                                    orders_for_update.get('to_cancel'))
+                # self.replace_orders(orders_for_update.get('to_create'),
+                #                     orders_for_update.get('to_cancel'))
             except Exception as err:
                 self.logger.info(f"{err}")
             await asyncio.sleep(self.settings.LOOP_INTERVAL)
