@@ -71,7 +71,7 @@ class BitfinexExchangeInterface:
         wallet = [wallet for wallet in self._post(endpoint) if wallet[0] == 'exchange' and wallet[1] == 'BTC']
         wallet = wallet[0] if len(wallet) > 0 else wallet
         size = round(wallet[2], 10) if len(wallet) > 0 else 0
-        return {'average_price': self.get_last_trade_price(), 'size': size}
+        return {'price': self.get_last_trade_price(), 'size': size}
 
     def get_last_trade_price(self):
         endpoint = f'trades/{self.instrument}/hist'
@@ -91,6 +91,26 @@ class BitfinexExchangeInterface:
         open_orders = self._post(method)
         return [self.get_order_params_from_responce(order) for order in open_orders]
 
+    def get_trade_params_from_responce(self, responce):
+        side = 'buy' if responce[4] > 0 else 'sell'
+        ratio = 1 if responce[4] > 0 else -1
+        return {'trade_id': responce[0],
+                'price': responce[5],
+                'size': responce[4] * ratio,
+                'side': side,
+                'fee': float(responce[9]) * -1,
+                'fee_currency': responce[10],
+                'timestamp': responce[2]
+                }
+
+
+    def get_trades(self, last_trade_time):
+        endpoint = f'auth/r/trades/{self.instrument}/hist'
+        params = {'start': last_trade_time,
+                  'limit': 2000}
+        trades = self._post(endpoint, params)
+        return [self.get_trade_params_from_responce(trade) for trade in trades]
+
     def get_order_state(self, order_id):
         method = f'auth/r/orders/{self.instrument}/hist'
         params = {'id': [order_id]}
@@ -98,38 +118,6 @@ class BitfinexExchangeInterface:
         return self.get_order_params_from_responce(order[0]) if len(order) > 0 \
             else {'order_id': order_id, 'order_state': 'cancelled'}
 
-    def get_orders_state(self, order_state_ids):
-        retry = 3
-        open_orders = self.get_open_orders()
-        open_orders_ids = [open_order.get('order_id') for open_order in open_orders]
-        method = f'auth/r/orders/{self.instrument}/hist'
-        params = {'id': order_state_ids + open_orders_ids}
-        existing_orders = [self.get_order_params_from_responce(order)
-                           for order in self._post(method, params)] if len(params.get('id')) > 0 else []
-        existing_orders_ids = [order.get('order_id') for order in existing_orders]
-        not_found_orders = [{'price': None,
-                             'size': None,
-                             'side': None,
-                             'order_id': order_id,
-                             'status': 'cancelled',
-                             'timestamp': None} for order_id in order_state_ids
-                            if order_id not in existing_orders_ids + open_orders_ids]
-
-        while len(not_found_orders) > 0 and retry > 0:
-            self.logger.info(f"not_found_orders: {[order.get('order_id') for order in not_found_orders]}")
-            time.sleep(1)
-            existing_orders = [self.get_order_params_from_responce(order)
-                               for order in self._post(method, params)] if len(params.get('id')) > 0 else []
-            existing_orders_ids = [order.get('order_id') for order in existing_orders]
-            not_found_orders = [{'price': None,
-                                 'size': None,
-                                 'side': None,
-                                 'order_id': order_id,
-                                 'status': 'cancelled',
-                                 'timestamp': None} for order_id in order_state_ids
-                                if order_id not in existing_orders_ids + open_orders_ids]
-            retry -= 1
-        return open_orders + existing_orders + not_found_orders
 
     def replace_order_status(self, raw_status):
         status_mapp = {'ACTIVE': 'open', 'CANCELED': 'cancelled'}
@@ -148,8 +136,9 @@ class BitfinexExchangeInterface:
                 'size': responce[7] * ratio,
                 'side': side,
                 'order_id': str(responce[0]),
-                'status': self.replace_order_status(responce[13]),
-                'timestamp': responce[5]}
+                # 'status': self.replace_order_status(responce[13]),
+                # 'timestamp': responce[5]
+                }
 
     def create_order(self, order):
         ratio = 1 if order['side'] == 'buy' else -1
@@ -167,6 +156,7 @@ class BitfinexExchangeInterface:
         method = f'auth/w/order/cancel'
         params = {'id': int(order_id)}
         result = self._post(method, params)
-        if 'SUCCESS' in result:
-            order_id = result[4][0]
-            return self.get_order_state(order_id)
+        return result[4][0]
+        # if 'SUCCESS' in result:
+        #     order_id = result[4][0]
+        #     return self.get_order_state(order_id)

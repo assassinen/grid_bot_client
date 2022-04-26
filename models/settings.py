@@ -6,23 +6,25 @@ class Settings:
     def __init__(self,
                  API_KEY,
                  API_SECRET,
-                 BASE_URL,
-                 API_URL,
-                 LOOP_INTERVAL,
-                 EXCHANGE,
-                 ORDER_SPREAD,
-                 ORDER_STEP,
-                 START_STEP,
-                 FREQUENCY_RATE,
-                 ORDER_SIZE,
-                 GRID_DEPTH,
-                 GRID_SIDE,
-                 SYMBOL,
-                 strategy='average_price',
+                 TOKEN,
+                 BASE_URL = 'https://api.bitfinex.com/',
+                 API_URL = 'v2',
+                 LOOP_INTERVAL = 10,
+                 EXCHANGE = 'bitfinex',
+                 ORDER_SPREAD = 1000,
+                 ORDER_STEP = 500,
+                 START_STEP = 5,
+                 FREQUENCY_RATE = 1,
+                 ORDER_SIZE = 0.0005,
+                 GRID_DEPTH = 180,
+                 GRID_SIDE = 'buy',
+                 SYMBOL = 'tBTCUSD',
+                 strategy='trades_price',
                  active=False
                  ):
         self.API_KEY = API_KEY
         self.API_SECRET = API_SECRET
+        self.TOKEN = TOKEN
         self.BASE_URL = BASE_URL
         self.API_URL = API_URL
         self.LOOP_INTERVAL = LOOP_INTERVAL
