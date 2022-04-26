@@ -36,6 +36,7 @@ class OrdersManager:
         self.orders_state = []
         self.base_url = 'http://grid-bot-server.herokuapp.com/api/v2.0/'
         # self.base_url = 'http://127.0.0.1:5000/api/v2.0/'
+        # self.base_url = 'http://moneyprinter.pythonanywhere.com/api/v2.0/'
         self.orders_calculator_url = f'{self.base_url}orders_calculator_by_{self.settings.strategy}/' \
                                      f'{self.settings.API_KEY}:{self.settings.SYMBOL}'
         self.set_settings_url = f'{self.base_url}set_settings/{self.settings.API_KEY}:{self.settings.SYMBOL}'
@@ -115,7 +116,7 @@ class OrdersManager:
                 return orders_for_update.json()
             else:
                 raise SetSettings(
-                    f'status_code: {status_code}'
+                    f'status_code: {status_code} '
                     f'response: {orders_for_update.text}'
                 )
         except Exception as err:
