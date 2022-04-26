@@ -148,21 +148,22 @@ class OrdersManager:
                 time.sleep(0.001)
 
                 orders_for_update = self.get_orders_for_update(kw)
-                for k, v in orders_for_update.items():
-                    self.logger.info(f"{k}: ")
-                    if k == 'last_db_trade_time':
-                        time.sleep(0.001)
-                        self.logger.info(f"  {v}")
-                        time.sleep(0.001)
-                    else:
-                        for order in v:
-                            self.logger.info(f"  {order}")
-                        time.sleep(0.001)
-
-                self.last_trade_time = orders_for_update.get('last_db_trade_time', self.last_trade_time)
-                time.sleep(0.001)
-                self.replace_orders(orders_for_update.get('to_create'),
-                                    orders_for_update.get('to_cancel'))
+                self.logger.info(f"orders_for_update: {orders_for_update}")
+                # for k, v in orders_for_update.items():
+                #     self.logger.info(f"{k}: ")
+                #     if k == 'last_db_trade_time':
+                #         time.sleep(0.001)
+                #         self.logger.info(f"  {v}")
+                #         time.sleep(0.001)
+                #     else:
+                #         for order in v:
+                #             self.logger.info(f"  {order}")
+                #         time.sleep(0.001)
+                #
+                # self.last_trade_time = orders_for_update.get('last_db_trade_time', self.last_trade_time)
+                # time.sleep(0.001)
+                # self.replace_orders(orders_for_update.get('to_create'),
+                #                     orders_for_update.get('to_cancel'))
             except Exception as err:
                 self.logger.info(f"{err}")
             await asyncio.sleep(self.settings.LOOP_INTERVAL)
