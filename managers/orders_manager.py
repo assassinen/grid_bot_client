@@ -104,6 +104,7 @@ class OrdersManager:
     def get_orders_for_update(self, kw):
         orders_for_update = requests.post(url=self.orders_calculator_url, headers=self.headers, json=kw)
         self.logger.info(f"orders_for_update: {orders_for_update}")
+        self.logger.info(f"orders_for_update: {orders_for_update.text}")
         try:
             status_code = orders_for_update.status_code
             result = orders_for_update.json()
