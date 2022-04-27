@@ -167,5 +167,6 @@ class OrdersManager:
                 self.logger.info(f"{err}")
             await asyncio.sleep(self.settings.LOOP_INTERVAL)
 
+
 class SetSettings(Exception):
     pass
