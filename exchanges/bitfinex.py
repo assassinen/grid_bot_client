@@ -89,7 +89,7 @@ class BitfinexExchangeInterface:
     def get_open_orders(self):
         method = f'auth/r/orders/{self.instrument}'
         open_orders = self._post(method)
-        return [self.get_order_params_from_responce(order) for order in open_orders]
+        return [self.get_order_params_from_responce(order) for order in open_orders if order[8] == 'EXCHANGE LIMIT']
 
     def get_trade_params_from_responce(self, responce):
         side = 'buy' if responce[4] > 0 else 'sell'
@@ -103,13 +103,12 @@ class BitfinexExchangeInterface:
                 'timestamp': responce[2]
                 }
 
-
     def get_trades(self, last_trade_time):
         endpoint = f'auth/r/trades/{self.instrument}/hist'
         params = {'start': last_trade_time,
                   'limit': 2000}
         trades = self._post(endpoint, params)
-        return [self.get_trade_params_from_responce(trade) for trade in trades]
+        return [self.get_trade_params_from_responce(trade) for trade in trades if trade[6] == 'EXCHANGE LIMIT']
 
     def get_order_state(self, order_id):
         method = f'auth/r/orders/{self.instrument}/hist'
@@ -136,8 +135,6 @@ class BitfinexExchangeInterface:
                 'size': responce[7] * ratio,
                 'side': side,
                 'order_id': str(responce[0]),
-                # 'status': self.replace_order_status(responce[13]),
-                # 'timestamp': responce[5]
                 }
 
     def create_order(self, order):
@@ -157,6 +154,3 @@ class BitfinexExchangeInterface:
         params = {'id': int(order_id)}
         result = self._post(method, params)
         return result[4][0]
-        # if 'SUCCESS' in result:
-        #     order_id = result[4][0]
-        #     return self.get_order_state(order_id)
