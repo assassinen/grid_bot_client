@@ -1,29 +1,27 @@
 import hashlib
 import hmac
-import time
 import json
+import time
+
 import requests
 
+API_KEY = ""
+API_SECRET = ""
 
-API_KEY = ''
-API_SECRET = ''
 
 def _gen_nonce():
-  return int(round(time.time() * 1000000))
+    return int(round(time.time() * 1000000))
+
 
 def generate_auth_headers(API_KEY, API_SECRET, path, body):
-  """
+    """
   Generate headers for a signed payload
   """
-  nonce = str(_gen_nonce())
-  signature = "/api/v2/{}{}{}".format(path, nonce, body)
-  h = hmac.new(API_SECRET.encode('utf8'), signature.encode('utf8'), hashlib.sha384)
-  signature = h.hexdigest()
-  return {
-    "bfx-nonce": nonce,
-    "bfx-apikey": API_KEY,
-    "bfx-signature": signature
-  }
+    nonce = str(_gen_nonce())
+    signature = "/api/v2/{}{}{}".format(path, nonce, body)
+    h = hmac.new(API_SECRET.encode("utf8"), signature.encode("utf8"), hashlib.sha384)
+    signature = h.hexdigest()
+    return {"bfx-nonce": nonce, "bfx-apikey": API_KEY, "bfx-signature": signature}
 
 
 def post(endpoint, data={}, params=""):
@@ -31,8 +29,8 @@ def post(endpoint, data={}, params=""):
     Send a pre-signed POST request to the bitfinex api
     @return response
     """
-    host = 'https://api.bitfinex.com/v2'
-    url = '{}/{}'.format(host, endpoint)
+    host = "https://api.bitfinex.com/v2"
+    url = "{}/{}".format(host, endpoint)
     sData = json.dumps(data)
     headers = {"content-type": "application/json"}
     headers.update(generate_auth_headers(API_KEY, API_SECRET, endpoint, sData))
@@ -61,34 +59,37 @@ def post(endpoint, data={}, params=""):
 # endpoint = 'auth/w/position/increase'
 # # body = {'symbol': 'tBTCUSD'}
 # #
-endpoint = f'auth/r/orders/tBTCUSD/hist'
-body = {'id': [78161127709,
-78160898992,
-78160738547,
-78160735843,
-78160455519,
-78160318854,
-78159751849,
-78156290646,
-78155904086,
-78151321434,
-78151144361,
-78150939048,
-78149651309,
-78149422266,
-78148562096,
-78148132503,
-78145646616,
-78145120341,
-78144161502,
-78143669906,
-78139207893,
-78139094713]}
+endpoint = f"auth/r/orders/tBTCUSD/hist"
+body = {
+    "id": [
+        78161127709,
+        78160898992,
+        78160738547,
+        78160735843,
+        78160455519,
+        78160318854,
+        78159751849,
+        78156290646,
+        78155904086,
+        78151321434,
+        78151144361,
+        78150939048,
+        78149651309,
+        78149422266,
+        78148562096,
+        78148132503,
+        78145646616,
+        78145120341,
+        78144161502,
+        78143669906,
+        78139207893,
+        78139094713,
+    ]
+}
 r = post(endpoint, body)
 # print(r.request.headers)
 for i in r.json():
     print(i[5])
-
 
     # async with aiohttp.ClientSession() as session:
     #     async with session.post(url + params, headers=headers, data=sData) as resp:

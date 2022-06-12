@@ -114,10 +114,6 @@ class OrdersManager:
             "grid_side": self.settings.GRID_SIDE,
         }
         result = requests.post(url=self.set_settings_url, headers=headers, json=settings)
-        print(result.request.url)
-        print(result.request.headers)
-        print(result.request.body)
-        print(result.text)
         try:
             if (
                 result.status_code == 200
