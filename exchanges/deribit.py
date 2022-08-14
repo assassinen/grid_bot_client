@@ -1,9 +1,10 @@
 import time
+
 import requests
 from models.states import OrderSide
 
-class DeribitExchangeInterface:
 
+class DeribitExchangeInterface:
     def __init__(self, key, secret, base_url, api_url, instrument):
         self.key = key
         self.secret = secret
@@ -14,14 +15,14 @@ class DeribitExchangeInterface:
         self.refresh_token = None
         self.expires_in = 0
         self.instrument = instrument
-        
+
     def _auth(self):
         method = 'public/auth'
         params = {
             'grant_type': 'client_credentials',
             'client_secret': self.secret,
             'client_id': self.key,
-            'scope': 'session:micropython'
+            'scope': 'session:micropython',
         }
         response = self._post(method, params)
         if response:
@@ -32,10 +33,7 @@ class DeribitExchangeInterface:
     def _post(self, method, params):
         url = self.url + method
         headers = {'Content-Type': 'application/json'}
-        data = {
-            'method': method,
-            'params': params
-        }
+        data = {'method': method, 'params': params}
         if method != 'public/auth' and self.expires_in < time.time():
             self._auth()
         if method.startswith('private'):
@@ -45,16 +43,19 @@ class DeribitExchangeInterface:
         except Exception as r:
             self.logger.info(r)
         if response.status_code != 200:
-            raise Exception(f"Wrong response code: {response.status_code}",
-                            f"{response.text}")
+            raise Exception(
+                f'Wrong response code: {response.status_code}', f'{response.text}'
+            )
         return response.json()['result']
 
     def get_positions(self):
         method = 'private/get_position'
         params = {'instrument_name': self.instrument}
         result = self._post(method, params)
-        return {'average_price': result.get('average_price'),
-                'size': result.get('size', 0)}
+        return {
+            'price': result.get('average_price'),
+            'size': result.get('size', 0),
+        }
 
     def get_get_mark_price(self):
         # для опционов
@@ -64,7 +65,7 @@ class DeribitExchangeInterface:
         return result[0]['mark_price'] if result else None
 
     def get_last_trade_price(self):
-        if self.instrument.endswith("C") or self.instrument.endswith("P"):
+        if self.instrument.endswith('C') or self.instrument.endswith('P'):
             return self.get_get_mark_price()
         method = 'public/get_last_trades_by_instrument'
         params = {'instrument_name': self.instrument, 'count': 1}
@@ -74,18 +75,77 @@ class DeribitExchangeInterface:
     def get_last_order_price(self, side):
         method = 'private/get_order_history_by_instrument'
         params = {'instrument_name': self.instrument, 'count': 1}
-        last_order_price = [order['price'] for order
-                            in self._post(method, params)
-                            if order['direction'] == side]
-        return last_order_price[0] if len(last_order_price) > 0 else self.get_last_trade_price()
+        last_order_price = [
+            order['price']
+            for order in self._post(method, params)
+            if order['direction'] == side
+        ]
+        return (
+            last_order_price[0]
+            if len(last_order_price) > 0
+            else self.get_last_trade_price()
+        )
 
     def get_order_params_from_responce(self, responce):
-        return {'price': responce.get('price'),
-                'size': responce.get('amount'),
-                'side': responce.get('direction'),
-                'order_id': responce.get('order_id'),
-                'status': responce.get('order_state'),
-                'timestamp': responce.get('last_update_timestamp')}
+        return {
+            'price': responce.get('price'),
+            'size': responce.get('amount'),
+            'side': responce.get('direction'),
+            'order_id': responce.get('order_id'),
+            # 'status': responce.get('order_state'),
+            # 'timestamp': responce.get('last_update_timestamp'),
+        }
+
+    def get_trade_params_from_responce(self, responce):
+        # side = 'buy' if responce[4] > 0 else 'sell'
+        # ratio = 1 if responce[4] > 0 else -1
+        return {
+            'trade_id': responce['trade_id'],
+            'price': responce['price'],
+            'size': responce['amount'],
+            'side': responce['direction'],
+            'fee': responce['fee'] * responce['index_price'],
+            'fee_currency': 'USD',
+            'timestamp': responce['timestamp'],
+        }
+
+    def get_trade_params_from_responce(self, responce):
+        # side = 'buy' if responce[4] > 0 else 'sell'
+        # ratio = 1 if responce[4] > 0 else -1
+        return {
+            'trade_id': responce['trade_id'],
+            'price': responce['price'],
+            'size': responce['amount'],
+            'side': responce['direction'],
+            'fee': responce['fee'] * responce['index_price'],
+            'fee_currency': 'USD',
+            'timestamp': responce['timestamp'],
+        }
+
+    def get_trade_params_from_transaction_log(self, responce):
+        return {
+            'trade_id': responce['trade_id'],
+            'price': responce['price'],
+            'size': responce['amount'],
+            'side': responce['side'].split()[1],
+            'fee': responce['commission'],
+            'fee_currency': responce['currency'],
+            'timestamp': responce['timestamp'],
+        }
+
+    def get_trades(self, last_trade_time):
+        endpoint = 'private/get_transaction_log'
+        params = {'currency': self.instrument.split('-')[0],
+                  'start_timestamp': last_trade_time,
+                  'end_timestamp': 	int(time.time() * 1000),
+                  'count': 1000}
+        trades = self._post(endpoint, params)
+        return [
+            self.get_trade_params_from_transaction_log(trade)
+            for trade in trades.get('logs', [])
+            if trade.get('instrument_name') == self.instrument and
+               trade.get('type') == 'trade'
+        ]
 
     def get_open_orders(self):
         method = 'private/get_open_orders_by_instrument'
@@ -105,8 +165,12 @@ class DeribitExchangeInterface:
     def get_orders_state(self, orders_state):
         open_orders = self.get_open_orders()
         open_order_ids = [open_order.get('order_id') for open_order in open_orders]
-        order_state_ids = [order_id for order_id in orders_state if order_id not in open_order_ids]
-        return open_orders + [self.get_order_state(order_id) for order_id in order_state_ids]
+        order_state_ids = [
+            order_id for order_id in orders_state if order_id not in open_order_ids
+        ]
+        return open_orders + [
+            self.get_order_state(order_id) for order_id in order_state_ids
+        ]
 
     def create_order(self, order):
         method = 'private/buy' if order['side'] == OrderSide.buy else 'private/sell'
