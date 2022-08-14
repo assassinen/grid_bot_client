@@ -10,7 +10,7 @@ load_dotenv()
 class BotsManager():
 
     def __init__(self):
-        self.default_settings = self.load_default_settings('settings/default_settings.json')
+        self.default_settings = self.load_default_settings('default_settings/default_settings.json')
         self.orders_managers = self.create_orders_manager_from_env()
 
     def load_default_settings(self, file):
