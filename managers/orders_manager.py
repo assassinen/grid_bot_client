@@ -40,6 +40,7 @@ class OrdersManager:
         self.orders_calculator_url = f'{self.base_url}orders_calculator_by_{self.settings.strategy}/' \
                                      f'{self.settings.API_KEY}:{self.settings.SYMBOL}'
         self.set_settings_url = f'{self.base_url}set_settings/{self.settings.API_KEY}:{self.settings.SYMBOL}'
+        self.get_settings_url = f'{self.base_url}get_settings/{self.settings.API_KEY}:{self.settings.SYMBOL}'
         self.set_settings()
         self.last_trade_time = 1
 
@@ -81,6 +82,17 @@ class OrdersManager:
                     self.logger.info(f"added order error: {err}")
             time.sleep(0.001)
         return orders_status
+
+    def get_settings(self):
+        settings = requests.get(url=self.get_settings_url, headers=self.headers).json()
+        self.settings.ORDER_SPREAD = settings.get('order_spread')
+        self.settings.ORDER_STEP = settings.get('order_step')
+        self.settings.START_STEP = settings.get('start_step')
+        self.settings.FREQUENCY_RATE = settings.get('frequency_rate')
+        self.settings.ORDER_SIZE = settings.get('order_size')
+        self.settings.GRID_DEPTH = settings.get('grid_depth')
+        self.settings.GRID_SIDE = settings.get('grid_side')
+
 
     def set_settings(self):
         settings = {'api_key': self.settings.API_KEY,
@@ -146,6 +158,8 @@ class OrdersManager:
                 for trade in kw.get("trades"):
                     self.logger.info(f"  {trade}")
                 time.sleep(0.001)
+
+                # self.get_settings()
 
                 orders_for_update = self.get_orders_for_update(kw)
                 for k, v in orders_for_update.items():
