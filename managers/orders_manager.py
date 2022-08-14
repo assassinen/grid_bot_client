@@ -31,17 +31,14 @@ class OrdersManager:
                                                                secret=self.settings.API_SECRET,
                                                                base_url=self.settings.BASE_URL,
                                                                api_url=self.settings.API_URL,
-                                                               instrument=self.settings.SYMBOL)
+                                                               instrument=self.settings.INSTRUMENT)
         self.logger = setup_custom_logger(f'orders_manager.{self.settings.API_KEY[:8]}')
         self.orders_state = []
         self.base_url = 'http://grid-bot-server.herokuapp.com/api/v2.0/'
         # self.base_url = 'http://127.0.0.1:5000/api/v2.0/'
         # self.base_url = 'http://moneyprinter.pythonanywhere.com/api/v2.0/'
         self.orders_calculator_url = f'{self.base_url}orders_calculator_by_{self.settings.strategy}/' \
-                                     f'{self.settings.API_KEY}:{self.settings.SYMBOL}'
-        self.set_settings_url = f'{self.base_url}set_settings/{self.settings.API_KEY}:{self.settings.SYMBOL}'
-        self.get_settings_url = f'{self.base_url}get_settings/{self.settings.API_KEY}:{self.settings.SYMBOL}'
-        self.set_settings()
+                                     f'{self.settings.API_KEY}:{self.settings.INSTRUMENT}'
         self.last_trade_time = 1
 
     def load_settings(self, file):
@@ -83,35 +80,6 @@ class OrdersManager:
             time.sleep(0.001)
         return orders_status
 
-    def get_settings(self):
-        settings = requests.get(url=self.get_settings_url, headers=self.headers).json()
-        self.settings.ORDER_SPREAD = settings.get('order_spread')
-        self.settings.ORDER_STEP = settings.get('order_step')
-        self.settings.START_STEP = settings.get('start_step')
-        self.settings.FREQUENCY_RATE = settings.get('frequency_rate')
-        self.settings.ORDER_SIZE = settings.get('order_size')
-        self.settings.GRID_DEPTH = settings.get('grid_depth')
-        self.settings.GRID_SIDE = settings.get('grid_side')
-
-
-    def set_settings(self):
-        settings = {'api_key': self.settings.API_KEY,
-                    'instrument': self.settings.SYMBOL,
-                    'order_spread': self.settings.ORDER_SPREAD,
-                    'order_step': self.settings.ORDER_STEP,
-                    'start_step': self.settings.START_STEP,
-                    'frequency_rate': self.settings.FREQUENCY_RATE,
-                    'order_size': self.settings.ORDER_SIZE,
-                    'grid_depth': self.settings.GRID_DEPTH,
-                    'grid_side': self.settings.GRID_SIDE}
-        result = requests.post(url=self.set_settings_url, json=settings)
-        try:
-            if result.status_code == 200 and result.json().get('result') == 'exchange_settings are saved':
-                self.logger.info('setting the bot parameters was successful')
-        except:
-            raise SetSettings(
-                f'setting the bot params failed'
-            )
 
     def get_orders_for_update(self, kw):
         orders_for_update = requests.post(url=self.orders_calculator_url, headers=self.headers, json=kw)
@@ -120,7 +88,6 @@ class OrdersManager:
             result = orders_for_update.json()
             if status_code == 400 and result == 'exchange_settings not found':
                 self.logger.info(f'result: {result}')
-                # self.set_settings()
                 raise SetSettings(
                     f'the exchange_settings will be available in the next iteration'
                 )
@@ -158,8 +125,6 @@ class OrdersManager:
                 for trade in kw.get("trades"):
                     self.logger.info(f"  {trade}")
                 time.sleep(0.001)
-
-                # self.get_settings()
 
                 orders_for_update = self.get_orders_for_update(kw)
                 for k, v in orders_for_update.items():
