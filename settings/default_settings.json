@@ -1,0 +1,16 @@
+{
+    "DERIBIT": {
+        "BASE_URL": "https://www.deribit.com/",
+        "API_URL": "api/v2/",
+        "LOOP_INTERVAL": 10,
+        "INSTRUMENT": "BTC-PERPETUAL",
+        "STRATEGY": "trades_price"
+    },
+    "BITFINEX": {
+        "BASE_URL": "https://api.bitfinex.com/",
+        "API_URL": "v2",
+        "LOOP_INTERVAL": 10,
+        "INSTRUMENT": "tBTCUSD",
+        "STRATEGY": "trades_price"
+    }
+}

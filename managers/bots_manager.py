@@ -10,12 +10,24 @@ load_dotenv()
 class BotsManager():
 
     def __init__(self):
-        self.default_settings = self.load_default_settings('default_settings/default_settings.json')
+        self.default_settings = {
+            'DERIBIT': {
+                'BASE_URL': 'https://www.deribit.com/',
+                'API_URL': 'api/v2/',
+                'LOOP_INTERVAL': 10,
+                'INSTRUMENT': 'BTC-PERPETUAL',
+                'STRATEGY': 'trades_price'
+            },
+            'BITFINEX': {
+                'BASE_URL': 'https://api.bitfinex.com/',
+                'API_URL': 'v2',
+                'LOOP_INTERVAL': 10,
+                'INSTRUMENT': 'tBTCUSD',
+                'STRATEGY': 'trades_price'
+            }
+        }
         self.orders_managers = self.create_orders_manager_from_env()
 
-    def load_default_settings(self, file):
-        with open(file) as f:
-            return json.load(f)
 
     def get_orders_managers(self):
         return self.orders_managers
