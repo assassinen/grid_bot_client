@@ -2,7 +2,6 @@ from managers.orders_manager import OrdersManager
 from dotenv import load_dotenv
 from models.settings import Settings
 import os
-import json
 
 load_dotenv()
 
@@ -27,7 +26,6 @@ class BotsManager():
             }
         }
         self.orders_managers = self.create_orders_manager_from_env()
-
 
     def get_orders_managers(self):
         return self.orders_managers

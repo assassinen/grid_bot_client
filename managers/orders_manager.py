@@ -4,12 +4,8 @@ import time
 import jsonpickle
 import requests
 
-from ex_bitmex.exchange import BitmexExchangeInterface
-from exchanges.binance import (BinanceExchangeVanillaOptionsInterface,
-                               BinanceExchangeCoinFuturesInterface)
 from exchanges.bitfinex import BitfinexExchangeInterface
 from exchanges.deribit import DeribitExchangeInterface
-from exchanges.tinkoff import TinkoffExchangeInterface
 from models.log import setup_custom_logger
 
 
@@ -18,12 +14,8 @@ class OrdersManager:
     def __init__(self, settings):
         self.settings = settings
         self.exchanges = {
-            'bitmex': BitmexExchangeInterface,
             'deribit': DeribitExchangeInterface,
-            'binance_coin_futures': BinanceExchangeCoinFuturesInterface,
-            'binance_vanilla_options': BinanceExchangeVanillaOptionsInterface,
             'bitfinex': BitfinexExchangeInterface,
-            'tinkoff': TinkoffExchangeInterface,
         }
         self.headers = {'Authorization': f'Bearer {settings.TOKEN}',
                         'Content-Type': 'application/json'}
