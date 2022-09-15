@@ -127,6 +127,11 @@ class OrdersManager:
         orders_for_update = requests.post(
             url=self.orders_calculator_url, headers=self.headers, json=kw
         )
+        print(orders_for_update.request.url)
+        print(orders_for_update.request.headers)
+        print(orders_for_update.request.body)
+        print(orders_for_update.status_code)
+        print(orders_for_update.text)
         try:
             status_code = orders_for_update.status_code
             result = orders_for_update.json()
@@ -190,11 +195,11 @@ class OrdersManager:
                 self.last_trade_time = orders_for_update.get(
                     "last_db_trade_time", self.last_trade_time
                 )
-                time.sleep(0.001)
-                self.replace_orders(
-                    orders_for_update.get("to_create"),
-                    orders_for_update.get("to_cancel"),
-                )
+                # time.sleep(0.001)
+                # self.replace_orders(
+                #     orders_for_update.get("to_create"),
+                #     orders_for_update.get("to_cancel"),
+                # )
             except Exception as err:
                 self.logger.info(f"{err}")
             await asyncio.sleep(self.settings.LOOP_INTERVAL)
