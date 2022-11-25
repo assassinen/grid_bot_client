@@ -4,5 +4,4 @@ websocket==0.2.1
 websocket-client-py3==0.15.0
 selenium~=3.141.0
 pytz==2021.3
-celery==5.1.2
-Flask==2.0.3
+python-dotenv==0.15.0
