@@ -6,5 +6,5 @@ class OrderStates:
 
 
 class OrderSide:
-    sell = 'sell'
-    buy = 'buy'
+    sell = "sell"
+    buy = "buy"
