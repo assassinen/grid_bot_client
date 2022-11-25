@@ -26,12 +26,13 @@ class OrdersManager:
                                                                instrument=self.settings.INSTRUMENT)
         self.logger = setup_custom_logger(f'orders_manager.{self.settings.API_KEY[:8]}')
         self.orders_state = []
-        self.base_url = 'http://grid-bot-server.herokuapp.com/api/v2.0/'
+        # self.base_url = 'http://grid-bot-server.herokuapp.com/api/v2.0/'
         # self.base_url = 'http://127.0.0.1:5000/api/v2.0/'
+        self.base_url = 'http://45.141.102.133:5000/api/v2.0/'
         # self.base_url = 'http://moneyprinter.pythonanywhere.com/api/v2.0/'
         self.orders_calculator_url = f'{self.base_url}orders_calculator_by_{self.settings.strategy}/' \
                                      f'{self.settings.API_KEY}:{self.settings.INSTRUMENT}'
-        self.last_trade_time = 1
+        self.last_trade_time = self.settings.last_trade_time
 
     def load_settings(self, file):
         with open(f'{file}.json') as f:
@@ -104,19 +105,23 @@ class OrdersManager:
             try:
                 kw = self.get_data_for_calculations()
 
-                self.logger.info(f"last_prices: {kw.get('last_prices')}")
-                self.logger.info(f"positions: {kw.get('positions')}")
-                time.sleep(0.001)
-                self.logger.info("open_orders: ")
-                time.sleep(0.001)
-                for order in kw.get("open_orders"):
-                    self.logger.info(f"  {order}")
-                time.sleep(0.001)
-                self.logger.info("trades: ")
-                time.sleep(0.001)
-                for trade in kw.get("trades"):
-                    self.logger.info(f"  {trade}")
-                time.sleep(0.001)
+                # self.logger.info(f"last_prices: {kw.get('last_prices')}")
+                # self.logger.info(f"positions: {kw.get('positions')}")
+                # time.sleep(0.001)
+                # self.logger.info("open_orders: ")
+                # time.sleep(0.001)
+                # for order in kw.get("open_orders"):
+                #     self.logger.info(f"  {order}")
+                # time.sleep(0.001)
+                # self.logger.info("trades: ")
+                # time.sleep(0.001)
+                # for trade in kw.get("trades"):
+                #     self.logger.info(f"  {trade}")
+                # time.sleep(0.001)
+
+                # print(len(kw['trades']))
+                # for i in kw['trades']:
+                #     print(i)
 
                 orders_for_update = self.get_orders_for_update(kw)
                 for k, v in orders_for_update.items():
@@ -132,8 +137,8 @@ class OrdersManager:
 
                 self.last_trade_time = orders_for_update.get('last_db_trade_time', self.last_trade_time)
                 time.sleep(0.001)
-                self.replace_orders(orders_for_update.get('to_create'),
-                                    orders_for_update.get('to_cancel'))
+                # self.replace_orders(orders_for_update.get('to_create'),
+                #                     orders_for_update.get('to_cancel'))
             except Exception as err:
                 self.logger.info(f"{err}")
             await asyncio.sleep(self.settings.LOOP_INTERVAL)

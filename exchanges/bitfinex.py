@@ -106,8 +106,11 @@ class BitfinexExchangeInterface:
 
     def get_trades(self, last_trade_time):
         endpoint = f'auth/r/trades/{self.instrument}/hist'
-        params = {'start': last_trade_time,
-                  'limit': 2000}
+        params = {
+            'start': last_trade_time,
+            'limit': 1000,
+            'sort': 1
+        }
         trades = self._post(endpoint, params)
         return [self.get_trade_params_from_responce(trade) for trade in trades]
 
